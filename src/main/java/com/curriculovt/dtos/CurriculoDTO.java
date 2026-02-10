@@ -2,7 +2,6 @@ package com.curriculovt.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +12,7 @@ public class CurriculoDTO {
     @NotBlank(message = "O nome é obrigatório.")
     private String nome;
 
-    private String sobrenome;
-
     private String img;
-
-    private Integer idade;
 
     private String resumo;
 
