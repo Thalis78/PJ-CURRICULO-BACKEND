@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "curriculos")
 @Getter
@@ -41,4 +44,7 @@ public class Curriculo {
     @Size(min = 10, max = 15, message = "Telefone inválido.")
     @Column(nullable = false, length = 15)
     private String telefone;
+
+    @OneToMany(mappedBy = "curriculo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Experiencia> experiencias = new ArrayList<>();
 }
