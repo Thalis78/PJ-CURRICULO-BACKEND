@@ -36,6 +36,6 @@ public class Experiencia {
     private String descricao;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "curriculo_id", nullable = false)
-    private Curriculo curriculo;
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
 }

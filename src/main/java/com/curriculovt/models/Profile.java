@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "curriculos")
+@Table(name = "profiles")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Curriculo {
+public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,6 @@ public class Curriculo {
 
     @NotBlank(message = "O e-mail é obrigatório.")
     @Email(message = "E-mail inválido.")
-    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "O telefone é obrigatório.")

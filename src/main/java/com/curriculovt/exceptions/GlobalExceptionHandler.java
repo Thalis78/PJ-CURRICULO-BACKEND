@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CurriculoNaoEncontradoException.class)
-    public ResponseEntity<ErroResponseDTO> curriculoNaoEncontrado(CurriculoNaoEncontradoException e) {
+    @ExceptionHandler(ProfileNaoEncontradoException.class)
+    public ResponseEntity<ErroResponseDTO> curriculoNaoEncontrado(ProfileNaoEncontradoException e) {
         ErroResponseDTO erro = new ErroResponseDTO(404, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }

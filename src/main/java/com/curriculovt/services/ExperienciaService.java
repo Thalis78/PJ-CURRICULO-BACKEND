@@ -2,9 +2,9 @@ package com.curriculovt.services;
 
 import com.curriculovt.dtos.ExperienciaDTO;
 import com.curriculovt.exceptions.ExperienciaNaoEncontradaException;
-import com.curriculovt.models.Curriculo;
+import com.curriculovt.models.Profile;
 import com.curriculovt.models.Experiencia;
-import com.curriculovt.repositorys.CurriculoRepository;
+import com.curriculovt.repositorys.ProfileRepository;
 import com.curriculovt.repositorys.ExperienciaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,20 +15,20 @@ import java.util.List;
 public class ExperienciaService {
 
     private final ExperienciaRepository experienciaRepository;
-    private final CurriculoRepository curriculoRepository;
+    private final ProfileRepository profileRepository; // Nome da variável atualizado
 
-    public ExperienciaService(ExperienciaRepository experienciaRepository, CurriculoRepository curriculoRepository) {
+    public ExperienciaService(ExperienciaRepository experienciaRepository, ProfileRepository profileRepository) {
         this.experienciaRepository = experienciaRepository;
-        this.curriculoRepository = curriculoRepository;
+        this.profileRepository = profileRepository;
     }
 
     @Transactional
-    public Experiencia criar(Long curriculoId, ExperienciaDTO dto) {
-        Curriculo curriculo = curriculoRepository.findById(curriculoId)
-                .orElseThrow(() -> new RuntimeException("Currículo pai não encontrado"));
+    public Experiencia criar(Long profileId, ExperienciaDTO dto) {
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new RuntimeException("Perfil pai não encontrado"));
 
         Experiencia experiencia = new Experiencia();
-        experiencia.setCurriculo(curriculo);
+        experiencia.setProfile(profile);
         aplicarDados(dto, experiencia);
 
         return experienciaRepository.save(experiencia);
@@ -41,8 +41,8 @@ public class ExperienciaService {
         return experienciaRepository.save(existente);
     }
 
-    public List<Experiencia> listarPorCurriculo(Long curriculoId) {
-        return experienciaRepository.findByCurriculoId(curriculoId);
+    public List<Experiencia> listarPorProfile(Long profileId) {
+        return experienciaRepository.findByProfileId(profileId);
     }
 
     public void excluir(Long id) {

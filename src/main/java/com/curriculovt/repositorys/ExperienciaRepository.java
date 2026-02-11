@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> {
 
-    List<Experiencia> findByCurriculoId(Long curriculoId);
+    List<Experiencia> findByProfileId(Long profileId);
 }
