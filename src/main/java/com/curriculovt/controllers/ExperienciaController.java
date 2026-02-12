@@ -19,18 +19,18 @@ public class ExperienciaController {
         this.experienciaService = experienciaService;
     }
 
-    @PostMapping("/curriculo/{curriculoId}")
+    @PostMapping("/profile/{profileId}")
     public ResponseEntity<Experiencia> criar(
-            @PathVariable Long curriculoId,
+            @PathVariable Long profileId,
             @Valid @RequestBody ExperienciaDTO dto) {
 
-        Experiencia salva = experienciaService.criar(curriculoId, dto);
+        Experiencia salva = experienciaService.criar(profileId, dto);
         return ResponseEntity.status(201).body(salva);
     }
 
-    @GetMapping("/curriculo/{curriculoId}")
-    public ResponseEntity<List<Experiencia>> listarPorCurriculo(@PathVariable Long curriculoId) {
-        return ResponseEntity.ok(experienciaService.listarPorCurriculo(curriculoId));
+    @GetMapping("/profile/{profileId}")
+    public ResponseEntity<List<Experiencia>> listarPorCurriculo(@PathVariable Long profileId) {
+        return ResponseEntity.ok(experienciaService.listarPorProfile(profileId));
     }
 
     @GetMapping("/{id}")

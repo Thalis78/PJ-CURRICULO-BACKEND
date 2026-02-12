@@ -44,6 +44,6 @@ public class Profile {
     @Column(nullable = false, length = 15)
     private String telefone;
 
-    @OneToMany(mappedBy = "curriculo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experiencia> experiencias = new ArrayList<>();
 }

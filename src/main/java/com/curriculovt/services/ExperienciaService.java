@@ -15,7 +15,7 @@ import java.util.List;
 public class ExperienciaService {
 
     private final ExperienciaRepository experienciaRepository;
-    private final ProfileRepository profileRepository; // Nome da variável atualizado
+    private final ProfileRepository profileRepository;
 
     public ExperienciaService(ExperienciaRepository experienciaRepository, ProfileRepository profileRepository) {
         this.experienciaRepository = experienciaRepository;
