@@ -1,36 +1,39 @@
 package com.curriculovt.models;
 
 import jakarta.persistence.*;
-        import jakarta.validation.constraints.*;
-        import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "experiencias")
+@Table(name = "formacoes")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Experiencia {
+public class Formacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O nome da empresa é obrigatório.")
-    private String empresa;
+    @NotBlank(message = "A instituição é obrigatória.")
+    private String instituicao;
 
-    @NotBlank(message = "O cargo é obrigatório.")
-    private String cargo;
+    @NotBlank(message = "O nome do curso é obrigatório.")
+    private String curso;
+
+    @NotBlank(message = "Informe o tipo (Ex: Superior, Técnico, Curso Avulso).")
+    private String tipo;
 
     private LocalDate dataInicio;
 
     private LocalDate dataFim;
 
-    private boolean atual;
+    private boolean concluido;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;

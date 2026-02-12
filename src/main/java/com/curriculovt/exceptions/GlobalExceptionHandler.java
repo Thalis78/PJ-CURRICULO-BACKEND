@@ -16,6 +16,17 @@ public class GlobalExceptionHandler {
         ErroResponseDTO erro = new ErroResponseDTO(404, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
+    @ExceptionHandler(FormacaoNaoEncontradaException.class)
+    public ResponseEntity<ErroResponseDTO> formacaoNaoEncontrada(FormacaoNaoEncontradaException e) {
+        ErroResponseDTO erro = new ErroResponseDTO(404, e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    @ExceptionHandler(ExperienciaNaoEncontradaException.class)
+    public ResponseEntity<ErroResponseDTO> experienciaNaoEncontrada(ExperienciaNaoEncontradaException e) {
+        ErroResponseDTO erro = new ErroResponseDTO(404, e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErroResponseDTO> handleValidation(ConstraintViolationException e) {
