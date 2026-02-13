@@ -35,6 +35,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
 
+    @ExceptionHandler(IdiomaNaoEncontradoException.class)
+    public ResponseEntity<ErroResponseDTO> idiomaNaoEncontrado(IdiomaNaoEncontradoException e) {
+        ErroResponseDTO erro = new ErroResponseDTO(404, e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErroResponseDTO> handleValidation(ConstraintViolationException e) {
         String primeiraMensagem = e.getConstraintViolations()
