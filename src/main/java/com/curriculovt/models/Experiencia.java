@@ -1,5 +1,6 @@
 package com.curriculovt.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
         import jakarta.validation.constraints.*;
         import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class Experiencia {
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
