@@ -34,7 +34,8 @@ public class Formacao {
 
     private LocalDate dataFim;
 
-    private boolean concluido;
+    @Column(nullable = false)
+    private Boolean atualmente = false;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;

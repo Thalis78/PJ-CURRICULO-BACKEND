@@ -2,8 +2,8 @@ package com.curriculovt.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-        import jakarta.validation.constraints.*;
-        import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class Experiencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O nome da empresa é obrigatório.")
+    @NotBlank(message = "O nome da empresa é obrigatória.")
     private String empresa;
 
     @NotBlank(message = "O cargo é obrigatório.")
@@ -31,7 +31,8 @@ public class Experiencia {
 
     private LocalDate dataFim;
 
-    private boolean atual;
+    @Column(nullable = false)
+    private Boolean atualmente = false;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;

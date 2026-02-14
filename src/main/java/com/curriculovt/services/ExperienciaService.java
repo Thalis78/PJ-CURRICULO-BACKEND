@@ -60,7 +60,7 @@ public class ExperienciaService {
         experiencia.setCargo(dto.getCargo());
         experiencia.setDataInicio(dto.getDataInicio());
         experiencia.setDataFim(dto.getDataFim());
-        experiencia.setAtual(dto.isAtual());
+        experiencia.setAtualmente(dto.getAtualmente());
         experiencia.setDescricao(dto.getDescricao());
     }
 }

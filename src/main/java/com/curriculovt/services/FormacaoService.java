@@ -59,7 +59,7 @@ public class FormacaoService {
         formacao.setTipo(dto.getTipo());
         formacao.setDataInicio(dto.getDataInicio());
         formacao.setDataFim(dto.getDataFim());
-        formacao.setConcluido(dto.isConcluido());
+        formacao.setAtualmente(dto.getAtualmente());
         formacao.setDescricao(dto.getDescricao());
     }
 }

@@ -22,7 +22,7 @@ public class FormacaoDTO {
 
     private LocalDate dataFim;
 
-    private boolean concluido;
+    private Boolean atualmente = false;
 
     private String descricao;
 }

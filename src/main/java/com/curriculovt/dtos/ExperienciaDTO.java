@@ -26,7 +26,7 @@ public class ExperienciaDTO {
 
     private LocalDate dataFim;
 
-    private boolean atual;
+    private Boolean atualmente = false;
 
     private String descricao;
 }
