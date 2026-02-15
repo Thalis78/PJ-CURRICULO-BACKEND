@@ -53,4 +53,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(erro);
     }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErroResponseDTO> handleMethodArgumentNotValid(org.springframework.web.bind.MethodArgumentNotValidException e) {
+        String mensagem = e.getBindingResult().getFieldErrors()
+                .stream()
+                .map(org.springframework.validation.FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse("Erro de validação nos dados");
+
+        ErroResponseDTO erro = new ErroResponseDTO(400, mensagem);
+        return ResponseEntity.badRequest().body(erro);
+    }
 }
