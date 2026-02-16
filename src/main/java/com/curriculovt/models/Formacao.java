@@ -37,9 +37,6 @@ public class Formacao {
     @Column(nullable = false)
     private Boolean atualmente = false;
 
-    @Column(columnDefinition = "TEXT")
-    private String descricao;
-
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
