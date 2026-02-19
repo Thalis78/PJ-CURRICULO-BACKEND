@@ -37,6 +37,8 @@ public class ProfileService {
         profile.setObjetivo(dto.getObjetivo());
         profile.setEmail(dto.getEmail());
         profile.setTelefone(dto.getTelefone());
+        profile.setLinkedin(dto.getLinkedin());
+        profile.setEstado(dto.getEstado());
     }
 
     @Transactional

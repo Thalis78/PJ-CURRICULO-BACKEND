@@ -46,6 +46,14 @@ public class Profile {
     @Column(nullable = false, length = 15)
     private String telefone;
 
+    @Column(length = 255)
+    private String linkedin;
+
+    @NotBlank(message = "O estado é obrigatório.")
+    @Size(min = 2, max = 2, message = "Use a sigla do estado (ex: SP).")
+    @Column(nullable = false, length = 2)
+    private String estado;
+
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experiencia> experiencias = new ArrayList<>();
 
