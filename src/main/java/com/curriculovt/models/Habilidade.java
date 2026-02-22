@@ -16,8 +16,8 @@ public class Habilidade {
     private Long id;
 
     @NotBlank(message = "O nome da habilidade é obrigatório.")
-    @Size(max = 20, message = "O nome da habilidade deve ter no máximo 20 caracteres.")
-    @Column(length = 20)
+    @Size(max = 30, message = "O nome da habilidade deve ter no máximo 30 caracteres.")
+    @Column(length = 30)
     private String nome;
 
     @JsonIgnore
