@@ -3,6 +3,7 @@ package com.curriculovt.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size; // Importação necessária
 import lombok.*;
 
 @Entity
@@ -15,9 +16,9 @@ public class Habilidade {
     private Long id;
 
     @NotBlank(message = "O nome da habilidade é obrigatório.")
+    @Size(max = 20, message = "O nome da habilidade deve ter no máximo 20 caracteres.")
+    @Column(length = 20)
     private String nome;
-
-    private String tipo;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

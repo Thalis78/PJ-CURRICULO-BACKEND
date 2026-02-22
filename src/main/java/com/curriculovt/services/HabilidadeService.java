@@ -58,6 +58,5 @@ public class HabilidadeService {
 
     private void aplicarDados(HabilidadeDTO dto, Habilidade habilidade) {
         habilidade.setNome(dto.getNome());
-        habilidade.setTipo(dto.getTipo());
     }
 }
