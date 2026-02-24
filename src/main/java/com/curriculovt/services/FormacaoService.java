@@ -54,11 +54,16 @@ public class FormacaoService {
     }
 
     private void aplicarDados(FormacaoDTO dto, Formacao formacao) {
-        formacao.setInstituicao(dto.getInstituicao());
-        formacao.setCurso(dto.getCurso());
-        formacao.setTipo(dto.getTipo());
+        formacao.setInstituicao(limpar(dto.getInstituicao()));
+        formacao.setCurso(limpar(dto.getCurso()));
+        formacao.setTipo(limpar(dto.getTipo()));
         formacao.setDataInicio(dto.getDataInicio());
         formacao.setDataFim(dto.getDataFim());
         formacao.setAtualmente(dto.getAtualmente());
+    }
+
+    private String limpar(String texto) {
+        if (texto == null) return null;
+        return texto.trim().replaceAll("\\s{2,}", " ");
     }
 }

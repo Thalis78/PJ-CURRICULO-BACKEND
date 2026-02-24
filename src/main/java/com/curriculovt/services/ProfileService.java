@@ -31,14 +31,18 @@ public class ProfileService {
     }
 
     private void aplicarDados(ProfileDTO dto, Profile profile) {
-        profile.setNome(dto.getNome());
+        profile.setNome(limpar(dto.getNome()));
         profile.setImg(dto.getImg());
-        profile.setResumo(dto.getResumo());
-        profile.setObjetivo(dto.getObjetivo());
-        profile.setEmail(dto.getEmail());
-        profile.setTelefone(dto.getTelefone());
-        profile.setLinkedin(dto.getLinkedin());
-        profile.setEstado(dto.getEstado());
+        profile.setResumo(limpar(dto.getResumo()));
+        profile.setObjetivo(limpar(dto.getObjetivo()));
+        profile.setEmail(limpar(dto.getEmail() != null ? dto.getEmail().toLowerCase() : null));
+        profile.setTelefone(limpar(dto.getTelefone()));
+        profile.setLinkedin(limpar(dto.getLinkedin()));
+        profile.setEstado(limpar(dto.getEstado()));
+    }
+
+    private String limpar(String texto) {
+        return (texto == null) ? null : texto.trim().replaceAll("\\s{2,}", " ");
     }
 
     @Transactional

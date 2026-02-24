@@ -57,6 +57,10 @@ public class HabilidadeService {
     }
 
     private void aplicarDados(HabilidadeDTO dto, Habilidade habilidade) {
-        habilidade.setNome(dto.getNome());
+        habilidade.setNome(limpar(dto.getNome()));
+    }
+
+    private String limpar(String texto) {
+        return (texto == null) ? null : texto.trim().replaceAll("\\s{2,}", " ");
     }
 }

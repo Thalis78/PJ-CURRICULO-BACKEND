@@ -57,7 +57,11 @@ public class IdiomaService {
     }
 
     private void aplicarDados(IdiomaDTO dto, Idioma idioma) {
-        idioma.setNome(dto.getNome());
-        idioma.setNivel(dto.getNivel());
+        idioma.setNome(limpar(dto.getNome()));
+        idioma.setNivel(limpar(dto.getNivel()));
+    }
+
+    private String limpar(String texto) {
+        return (texto == null) ? null : texto.trim().replaceAll("\\s{2,}", " ");
     }
 }

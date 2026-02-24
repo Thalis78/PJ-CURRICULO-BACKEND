@@ -56,11 +56,20 @@ public class ExperienciaService {
     }
 
     private void aplicarDados(ExperienciaDTO dto, Experiencia experiencia) {
-        experiencia.setEmpresa(dto.getEmpresa());
-        experiencia.setCargo(dto.getCargo());
+        experiencia.setEmpresa(limparTexto(dto.getEmpresa()));
+        experiencia.setCargo(limparTexto(dto.getCargo()));
+
         experiencia.setDataInicio(dto.getDataInicio());
         experiencia.setDataFim(dto.getDataFim());
         experiencia.setAtualmente(dto.getAtualmente());
-        experiencia.setDescricao(dto.getDescricao());
+
+        experiencia.setDescricao(dto.getDescricao() != null ? dto.getDescricao().trim() : null);
+    }
+
+    private String limparTexto(String texto) {
+        if (texto == null) {
+            return null;
+        }
+        return texto.trim().replaceAll("\\s{2,}", " ");
     }
 }
