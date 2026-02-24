@@ -3,7 +3,7 @@ package com.curriculovt.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size; // Importação necessária
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
