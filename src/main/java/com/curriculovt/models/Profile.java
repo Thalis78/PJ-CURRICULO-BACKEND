@@ -50,8 +50,7 @@ public class Profile {
     private String linkedin;
 
     @NotBlank(message = "O estado é obrigatório.")
-    @Size(min = 2, max = 2, message = "Use a sigla do estado (ex: SP).")
-    @Column(nullable = false, length = 2)
+    @Column(nullable = false)
     private String estado;
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)

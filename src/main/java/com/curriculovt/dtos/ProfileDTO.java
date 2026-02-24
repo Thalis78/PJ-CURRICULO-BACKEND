@@ -31,8 +31,6 @@ public class ProfileDTO {
     private String linkedin;
 
     @NotBlank(message = "O estado é obrigatório.")
-    @Size(min = 2, max = 2, message = "Informe apenas a sigla do estado (ex: SP).")
-    @Pattern(regexp = "[A-Z]{2}", message = "O estado deve conter 2 letras maiúsculas.")
     private String estado;
 
 }
