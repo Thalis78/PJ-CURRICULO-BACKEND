@@ -2,13 +2,17 @@ package com.curriculovt.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+
 @Getter
 @Setter
 public class ProfileDTO {
+
+    @NotNull(message = "O ID do usuário é obrigatório para vincular o perfil.")
+    private Long userId;
 
     @NotBlank(message = "O nome é obrigatório.")
     private String nome;
@@ -32,5 +36,4 @@ public class ProfileDTO {
 
     @NotBlank(message = "O estado é obrigatório.")
     private String estado;
-
 }

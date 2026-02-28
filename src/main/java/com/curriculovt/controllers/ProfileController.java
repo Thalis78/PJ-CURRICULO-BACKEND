@@ -3,6 +3,7 @@ package com.curriculovt.controllers;
 import com.curriculovt.dtos.ProfileDTO;
 import com.curriculovt.models.Profile;
 import com.curriculovt.services.ProfileService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,6 @@ public class ProfileController {
     @PostMapping
     public ResponseEntity<Profile> criar(
             @Valid @RequestBody ProfileDTO dto) {
-
         Profile salvo = profileService.criar(dto);
         return ResponseEntity.status(201).body(salvo);
     }
@@ -43,5 +43,11 @@ public class ProfileController {
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         profileService.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Profile> buscarPorUserId(@PathVariable Long userId) {
+        Profile profile = profileService.buscarPorUserId(userId);
+        return ResponseEntity.ok(profile);
     }
 }

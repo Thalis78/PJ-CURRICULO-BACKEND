@@ -1,12 +1,9 @@
 package com.curriculovt.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +18,11 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"profiles", "password", "authorities"}) // Evita o loop e esconde a senha
+    private User user;
 
     @NotBlank(message = "O campo nome não pode estar em branco.")
     @Column(nullable = false, length = 100)

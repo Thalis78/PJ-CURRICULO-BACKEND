@@ -5,8 +5,11 @@ import com.curriculovt.exceptions.IdiomaNaoEncontradoException;
 import com.curriculovt.exceptions.ProfileNaoEncontradoException;
 import com.curriculovt.models.Idioma;
 import com.curriculovt.models.Profile;
+import com.curriculovt.models.User;
 import com.curriculovt.repositorys.IdiomaRepository;
 import com.curriculovt.repositorys.ProfileRepository;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,8 @@ public class IdiomaService {
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil pai não encontrado"));
 
+        validarPropriedade(profile.getUser().getId());
+
         Idioma idioma = new Idioma();
         idioma.setProfile(profile);
         aplicarDados(dto, idioma);
@@ -38,22 +43,48 @@ public class IdiomaService {
     @Transactional
     public Idioma atualizar(Long id, IdiomaDTO dto) {
         Idioma existente = buscarPorId(id);
+        validarPropriedade(existente.getProfile().getUser().getId());
+
         aplicarDados(dto, existente);
         return idiomaRepository.save(existente);
     }
 
+    @Transactional(readOnly = true)
     public List<Idioma> listarPorProfile(Long profileId) {
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil não encontrado"));
+
+        validarPropriedade(profile.getUser().getId());
+
         return idiomaRepository.findByProfileId(profileId);
     }
 
+    @Transactional
     public void excluir(Long id) {
-        idiomaRepository.delete(buscarPorId(id));
+        Idioma existente = buscarPorId(id);
+        validarPropriedade(existente.getProfile().getUser().getId());
+        idiomaRepository.delete(existente);
     }
 
+    @Transactional(readOnly = true)
     public Idioma buscarPorId(Long id) {
-        return idiomaRepository.findById(id)
+        Idioma idioma = idiomaRepository.findById(id)
                 .orElseThrow(() ->
                         new IdiomaNaoEncontradoException("Idioma não encontrado"));
+
+        validarPropriedade(idioma.getProfile().getUser().getId());
+        return idioma;
+    }
+
+    private void validarPropriedade(Long donoId) {
+        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        boolean isAdmin = usuarioLogado.getRole().name().equals("ADMIN");
+        boolean isDono = usuarioLogado.getId().equals(donoId);
+
+        if (!isAdmin && !isDono) {
+            throw new AccessDeniedException("Acesso negado: Você não tem permissão para esta ação.");
+        }
     }
 
     private void aplicarDados(IdiomaDTO dto, Idioma idioma) {
