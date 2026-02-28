@@ -36,13 +36,15 @@ public class AuthController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
-                Map<String, String> errorResponse = new HashMap<>();
-                errorResponse.put("mensagem", "Sua assinatura expirou em " + user.getDataExpiracao() + ". Renove seu plano.");
-                return ResponseEntity.status(403).body(errorResponse);
-            }
-
             if (passwordEncoder.matches(data.getPassword(), user.getPassword())) {
+
+                if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("mensagem", "Sua assinatura expirou.");
+                    errorResponse.put("dataExpiracao", user.getDataExpiracao()); // Para o front ler no erro
+                    return ResponseEntity.status(403).body(errorResponse);
+                }
+
                 String token = tokenService.generateToken(user);
 
                 Map<String, Object> response = new HashMap<>();
@@ -58,7 +60,6 @@ public class AuthController {
 
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("mensagem", "Usuário ou senha inválidos");
-
         return ResponseEntity.status(401).body(errorResponse);
     }
 }
