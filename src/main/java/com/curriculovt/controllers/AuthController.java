@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,13 @@ public class AuthController {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+
+            if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("mensagem", "Sua assinatura expirou em " + user.getDataExpiracao() + ". Renove seu plano.");
+                return ResponseEntity.status(403).body(errorResponse);
+            }
+
             if (passwordEncoder.matches(data.getPassword(), user.getPassword())) {
                 String token = tokenService.generateToken(user);
 

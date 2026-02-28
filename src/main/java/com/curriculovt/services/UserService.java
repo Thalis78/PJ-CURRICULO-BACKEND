@@ -31,6 +31,11 @@ public class UserService {
         }
     }
 
+    private LocalDateTime ajustarParaFinalDoDia(LocalDateTime data) {
+        if (data == null) return null;
+        return data.withHour(23).withMinute(59).withSecond(59).withNano(0);
+    }
+
     @Transactional
     public User saveUser(User user) {
         validarSenhaForte(user.getPassword());
@@ -42,7 +47,8 @@ public class UserService {
         }
 
         if (user.getRole() == UserRole.COMMON) {
-            user.setDataExpiracao(LocalDateTime.now().plusMonths(1));
+            LocalDateTime dataExpiracaoCalculada = LocalDateTime.now().plusDays(1).plusMonths(1);
+            user.setDataExpiracao(ajustarParaFinalDoDia(dataExpiracaoCalculada));
         } else {
             user.setDataExpiracao(null);
         }
@@ -88,7 +94,11 @@ public class UserService {
 
         if (userLogado.getRole() == UserRole.ADMIN) {
             userNoBanco.setRole(userDetails.getRole());
-            userNoBanco.setDataExpiracao(userDetails.getDataExpiracao());
+            if (userDetails.getDataExpiracao() != null) {
+                userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
+            } else {
+                userNoBanco.setDataExpiracao(null);
+            }
         }
 
         return userRepository.save(userNoBanco);

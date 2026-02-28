@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.curriculovt.models.User;
+import com.curriculovt.models.UserRole;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +25,23 @@ public class TokenService {
                     .withIssuer("curriculo-vt")
                     .withSubject(user.getUsername())
                     .withClaim("role", user.getRole().toString())
-                    .withExpiresAt(genExpirationDate())
+                    .withExpiresAt(genExpirationDate(user))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token", exception);
         }
     }
 
-    private Instant genExpirationDate() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    private Instant genExpirationDate(User user) {
+        LocalDateTime dataLimiteSessao = LocalDateTime.now().plusHours(2);
+
+        if (user.getRole() == UserRole.COMMON && user.getDataExpiracao() != null) {
+            if (user.getDataExpiracao().isBefore(dataLimiteSessao)) {
+                return user.getDataExpiracao().toInstant(ZoneOffset.of("-03:00"));
+            }
+        }
+
+        return dataLimiteSessao.toInstant(ZoneOffset.of("-03:00"));
     }
 
     public String validateToken(String token) {
