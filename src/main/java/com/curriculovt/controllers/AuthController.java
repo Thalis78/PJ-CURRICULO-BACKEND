@@ -30,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO data) {
-        Optional<User> userOptional = userService.findByUsername(data.getUsername());
+        Optional<User> userOptional = userService.findByUsername(data.getUsername().toLowerCase().trim());
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -42,6 +42,7 @@ public class AuthController {
                 response.put("id", user.getId());
                 response.put("username", user.getUsername());
                 response.put("role", user.getRole());
+                response.put("dataExpiracao", user.getDataExpiracao());
 
                 return ResponseEntity.ok(response);
             }
