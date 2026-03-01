@@ -55,9 +55,8 @@ public class ExperienciaService {
 
         validarPropriedade(profile.getUser().getId());
 
-        return experienciaRepository.findByProfileId(profileId);
+        return experienciaRepository.findByProfileIdOrderByDataInicioDesc(profileId);
     }
-
     @Transactional
     public void excluir(Long id) {
         Experiencia existente = buscarPorId(id);

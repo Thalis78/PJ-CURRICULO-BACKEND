@@ -52,11 +52,11 @@ public class FormacaoService {
     @Transactional(readOnly = true)
     public List<Formacao> listarPorProfile(Long profileId) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Perfil não encontrado"));
 
         validarPropriedade(profile.getUser().getId());
 
-        return formacaoRepository.findByProfileId(profileId);
+        return formacaoRepository.findByProfileIdOrderByDataFimDesc(profileId);
     }
 
     @Transactional
