@@ -25,6 +25,10 @@ public class ProfileService {
     public Profile criar(ProfileDTO dto) {
         validarPropriedade(dto.getUserId());
 
+        if (profileRepository.findByUserId(dto.getUserId()).isPresent()) {
+            throw new IllegalStateException("Você já possui um perfil cadastrado. Atualize o existente.");
+        }
+
         Profile profile = new Profile();
         User user = userService.findById(dto.getUserId());
         profile.setUser(user);
@@ -34,30 +38,44 @@ public class ProfileService {
 
     @Transactional
     public Profile atualizar(Long id, ProfileDTO dto) {
-        Profile existente = buscarPorId(id);
+        Profile existente = profileRepository.findById(id)
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Não foi possível atualizar: Perfil não encontrado."));
 
         validarPropriedade(existente.getUser().getId());
 
-        if (dto.getUserId() != null) {
-            User user = userService.findById(dto.getUserId());
-            existente.setUser(user);
+        if (dto.getUserId() != null && !dto.getUserId().equals(existente.getUser().getId())) {
+            validarPropriedade(dto.getUserId());
+            User novoDono = userService.findById(dto.getUserId());
+            existente.setUser(novoDono);
         }
+
         aplicarDados(dto, existente);
         return profileRepository.save(existente);
     }
 
     @Transactional
     public void excluir(Long id) {
-        Profile existente = buscarPorId(id);
-        validarPropriedade(existente.getUser().getId());
-        profileRepository.delete(existente);
-    }
+        // 1. Busca o perfil ou estoura erro
+        Profile existente = profileRepository.findById(id)
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Não foi possível excluir: Perfil não encontrado."));
 
+        // 2. Valida se o cabra é o dono mesmo
+        validarPropriedade(existente.getUser().getId());
+
+        // 3. O PULO DO GATO: Limpa a referência no objeto User
+        // Como é @OneToOne, o User tem um campo 'profile'. Se não limpar, o Hibernate tenta manter vivo.
+        User dono = existente.getUser();
+        dono.setProfile(null); // Corta o vínculo bidirecional
+
+        // 4. Agora sim, deleta sem dó
+        profileRepository.delete(existente);
+
+        // Dica extra: Se você usa cache de segundo nível, profileRepository.flush() pode ajudar aqui.
+    }
     @Transactional(readOnly = true)
     public Profile buscarPorId(Long id) {
         Profile profile = profileRepository.findById(id)
-                .orElseThrow(() ->
-                        new ProfileNaoEncontradoException("Perfil profissional não encontrado"));
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil profissional não encontrado"));
 
         validarPropriedade(profile.getUser().getId());
         return profile;
@@ -78,7 +96,7 @@ public class ProfileService {
         boolean isDono = usuarioLogado.getId().equals(donoId);
 
         if (!isAdmin && !isDono) {
-            throw new AccessDeniedException("Acesso negado: Este perfil não pertence a você.");
+            throw new AccessDeniedException("Acesso negado: Você só pode gerenciar o seu próprio perfil.");
         }
     }
 

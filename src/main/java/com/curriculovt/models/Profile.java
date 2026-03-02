@@ -19,9 +19,9 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"profiles", "password", "authorities"}) // Evita o loop e esconde a senha
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnoreProperties({"profile", "password", "authorities"})
     private User user;
 
     @NotBlank(message = "O campo nome não pode estar em branco.")

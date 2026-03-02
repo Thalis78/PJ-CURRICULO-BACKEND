@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,9 +27,23 @@ public class GlobalExceptionHandler {
             UserNaoEncontradoException.class
     })
     public ResponseEntity<ErroResponseDTO> handleNotFound(RuntimeException e) {
-        logger.warn("Recurso nao encontrado: {}", e.getMessage());
+        logger.warn("Recurso não encontrado: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErroResponseDTO(404, e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErroResponseDTO> handleBusinessRule(IllegalStateException e) {
+        logger.warn("Regra de negócio violada: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErroResponseDTO(400, e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErroResponseDTO> handleAccessDenied(AccessDeniedException e) {
+        logger.warn("Tentativa de acesso não autorizado: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErroResponseDTO(403, "Acesso negado: Você não tem permissão para esta ação."));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -37,7 +52,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst()
-                .orElse("Erro de validacao");
+                .orElse("Erro de validação");
 
         return ResponseEntity.badRequest().body(new ErroResponseDTO(400, primeiraMensagem));
     }
@@ -48,17 +63,16 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(org.springframework.validation.FieldError::getDefaultMessage)
                 .findFirst()
-                .orElse("Erro de validacao nos dados");
+                .orElse("Erro de validação nos dados");
 
         return ResponseEntity.badRequest().body(new ErroResponseDTO(400, mensagem));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErroResponseDTO> handleDataIntegrity(DataIntegrityViolationException e) {
-        logger.error("Erro de integridade no banco: Dados duplicados ou ausentes.");
-
+        logger.error("Erro de integridade no banco: {}", e.getMessage());
         return ResponseEntity.badRequest()
-                .body(new ErroResponseDTO(400, "Os dados enviados sao invalidos ou ja existem no sistema."));
+                .body(new ErroResponseDTO(400, "Os dados enviados são inválidos ou já existem no sistema."));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -66,5 +80,12 @@ public class GlobalExceptionHandler {
         logger.warn("JSON enviado com erro de sintaxe.");
         return ResponseEntity.badRequest()
                 .body(new ErroResponseDTO(400, "Erro na leitura do JSON. Verifique a sintaxe."));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErroResponseDTO> handleGeneralException(Exception e) {
+        logger.error("ERRO NÃO TRATADO: ", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErroResponseDTO(500, "Ocorreu um erro interno no servidor."));
     }
 }
