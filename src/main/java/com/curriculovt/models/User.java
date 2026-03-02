@@ -41,11 +41,13 @@ public class User {
     @Column(name = "data_expiracao")
     private LocalDateTime dataExpiracao;
 
+    @Column(name = "senha_redefinida_por_email", nullable = false)
+    private boolean senhaRedefinidaPorEmail = false;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Profile profile;
 
-    // Helper para verificar se a assinatura expirou
     public boolean estaExpirado() {
         if (this.dataExpiracao == null) return true;
         return this.dataExpiracao.isBefore(LocalDateTime.now());

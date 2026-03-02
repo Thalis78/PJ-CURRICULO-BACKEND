@@ -42,6 +42,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        user.setSenhaRedefinidaPorEmail(false);
+
         if (user.getEmail() != null) {
             user.setEmail(user.getEmail().toLowerCase().trim());
         }
@@ -58,14 +60,13 @@ public class UserService {
 
     public Page<User> findAllCommon(String termo, Pageable pageable) {
         validarAdmin();
-
         if (termo != null && !termo.isBlank()) {
             return userRepository.findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
                     UserRole.COMMON, termo, UserRole.COMMON, termo, pageable);
         }
-
         return userRepository.findByRole(UserRole.COMMON, pageable);
     }
+
     public User findById(Long id) {
         validarPropriedadeOuAdmin(id);
         return userRepository.findById(id)
@@ -80,13 +81,12 @@ public class UserService {
 
         validarPropriedadeOuAdmin(id);
 
-        String senhaVindaDoFront = userDetails.getPassword();
-        String senhaAtualNoBanco = userNoBanco.getPassword();
-
-        if (senhaVindaDoFront != null && !senhaVindaDoFront.isBlank()) {
-            if (!senhaVindaDoFront.equals(senhaAtualNoBanco) && !senhaVindaDoFront.startsWith("$2a$")) {
-                validarSenhaForte(senhaVindaDoFront);
-                userNoBanco.setPassword(passwordEncoder.encode(senhaVindaDoFront));
+        if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank()) {
+            if (!userDetails.getPassword().equals(userNoBanco.getPassword()) && !userDetails.getPassword().startsWith("$2a$")) {
+                validarSenhaForte(userDetails.getPassword());
+                userNoBanco.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+                // Se o próprio usuário está trocando a senha, removemos o flag de reset
+                userNoBanco.setSenhaRedefinidaPorEmail(false);
             }
         }
 
@@ -99,11 +99,11 @@ public class UserService {
         }
 
         if (userLogado.getRole() == UserRole.ADMIN) {
-            userNoBanco.setRole(userDetails.getRole());
+            if (userDetails.getRole() != null) {
+                userNoBanco.setRole(userDetails.getRole());
+            }
             if (userDetails.getDataExpiracao() != null) {
                 userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
-            } else {
-                userNoBanco.setDataExpiracao(null);
             }
         }
 

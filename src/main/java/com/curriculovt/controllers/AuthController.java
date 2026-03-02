@@ -4,6 +4,7 @@ import com.curriculovt.dtos.LoginDTO;
 import com.curriculovt.models.User;
 import com.curriculovt.services.TokenService;
 import com.curriculovt.services.UserService;
+import com.curriculovt.services.EnviarEmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +30,11 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private EnviarEmailService enviarEmailService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO data) {
-        // Agora buscamos pelo e-mail
         Optional<User> userOptional = userService.findByEmail(data.getEmail().toLowerCase().trim());
 
         if (userOptional.isPresent()) {
@@ -56,6 +59,7 @@ public class AuthController {
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole());
                 response.put("dataExpiracao", user.getDataExpiracao());
+                response.put("senhaRedefinidaPorEmail", user.isSenhaRedefinidaPorEmail());
 
                 return ResponseEntity.ok(response);
             }
@@ -64,5 +68,27 @@ public class AuthController {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("mensagem", "E-mail ou senha inválidos");
         return ResponseEntity.status(401).body(errorResponse);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+
+        if (email == null || email.isBlank()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "O e-mail é obrigatório.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            enviarEmailService.resetarSenha(email.toLowerCase().trim());
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Uma senha temporaria foi enviada para " + email);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", e.getMessage());
+            return ResponseEntity.status(404).body(response);
+        }
     }
 }
