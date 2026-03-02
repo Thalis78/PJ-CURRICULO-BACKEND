@@ -23,7 +23,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("curriculo-vt")
-                    .withSubject(user.getUsername())
+                    .withSubject(user.getEmail())
                     .withClaim("role", user.getRole().toString())
                     .withExpiresAt(genExpirationDate(user))
                     .sign(algorithm);

@@ -31,7 +31,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO data) {
-        Optional<User> userOptional = userService.findByUsername(data.getUsername().toLowerCase().trim());
+        // Agora buscamos pelo e-mail
+        Optional<User> userOptional = userService.findByEmail(data.getEmail().toLowerCase().trim());
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -41,7 +42,8 @@ public class AuthController {
                 if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
                     Map<String, Object> errorResponse = new HashMap<>();
                     errorResponse.put("mensagem", "Sua assinatura expirou.");
-                    errorResponse.put("dataExpiracao", user.getDataExpiracao()); // Para o front ler no erro
+                    errorResponse.put("status", "EXPIRADO");
+                    errorResponse.put("dataExpiracao", user.getDataExpiracao());
                     return ResponseEntity.status(403).body(errorResponse);
                 }
 
@@ -50,7 +52,8 @@ public class AuthController {
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token);
                 response.put("id", user.getId());
-                response.put("username", user.getUsername());
+                response.put("nome", user.getNome());
+                response.put("email", user.getEmail());
                 response.put("role", user.getRole());
                 response.put("dataExpiracao", user.getDataExpiracao());
 
@@ -59,7 +62,7 @@ public class AuthController {
         }
 
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("mensagem", "Usuário ou senha inválidos");
+        errorResponse.put("mensagem", "E-mail ou senha inválidos");
         return ResponseEntity.status(401).body(errorResponse);
     }
 }

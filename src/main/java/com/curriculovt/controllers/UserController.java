@@ -25,11 +25,11 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
-            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String filtro,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(userService.findAllCommon(username, pageable));
-    }
 
+        return ResponseEntity.ok(userService.findAllCommon(filtro, pageable));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));

@@ -42,12 +42,12 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        if (user.getUsername() != null) {
-            user.setUsername(user.getUsername().toLowerCase().trim());
+        if (user.getEmail() != null) {
+            user.setEmail(user.getEmail().toLowerCase().trim());
         }
 
         if (user.getRole() == UserRole.COMMON) {
-            LocalDateTime dataExpiracaoCalculada = LocalDateTime.now().plusDays(1).plusMonths(1);
+            LocalDateTime dataExpiracaoCalculada = LocalDateTime.now().plusMonths(1);
             user.setDataExpiracao(ajustarParaFinalDoDia(dataExpiracaoCalculada));
         } else {
             user.setDataExpiracao(null);
@@ -56,14 +56,16 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Page<User> findAllCommon(String username, Pageable pageable) {
+    public Page<User> findAllCommon(String termo, Pageable pageable) {
         validarAdmin();
-        if (username != null && !username.isBlank()) {
-            return userRepository.findByRoleAndUsernameContainingIgnoreCase(UserRole.COMMON, username, pageable);
+
+        if (termo != null && !termo.isBlank()) {
+            return userRepository.findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
+                    UserRole.COMMON, termo, UserRole.COMMON, termo, pageable);
         }
+
         return userRepository.findByRole(UserRole.COMMON, pageable);
     }
-
     public User findById(Long id) {
         validarPropriedadeOuAdmin(id);
         return userRepository.findById(id)
@@ -88,8 +90,12 @@ public class UserService {
             }
         }
 
-        if (userDetails.getUsername() != null) {
-            userNoBanco.setUsername(userDetails.getUsername().toLowerCase().trim());
+        if (userDetails.getNome() != null) {
+            userNoBanco.setNome(userDetails.getNome());
+        }
+
+        if (userDetails.getEmail() != null) {
+            userNoBanco.setEmail(userDetails.getEmail().toLowerCase().trim());
         }
 
         if (userLogado.getRole() == UserRole.ADMIN) {
@@ -111,8 +117,8 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     private User getUsuarioLogado() {
