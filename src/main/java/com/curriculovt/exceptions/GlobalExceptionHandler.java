@@ -13,9 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,22 +26,15 @@ public class GlobalExceptionHandler {
             ExperienciaNaoEncontradaException.class,
             HabilidadeNaoEncontradaException.class,
             IdiomaNaoEncontradoException.class,
-            UserNaoEncontradoException.class
+            UserNaoEncontradoException.class,
+            ResourceNotFoundException.class
     })
     public ResponseEntity<ErroResponseDTO> handleNotFound(RuntimeException e) {
         logger.warn("Recurso não encontrado: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErroResponseDTO(404, e.getMessage()));
     }
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND.value());
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErroResponseDTO> handleBusinessRule(IllegalStateException e) {
         logger.warn("Regra de negócio violada: {}", e.getMessage());
@@ -55,18 +46,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponseDTO> handleAccessDenied(AccessDeniedException e) {
         logger.warn("Tentativa de acesso não autorizado: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErroResponseDTO(403, "Acesso negado: Você não tem permissão para esta ação."));
+                .body(new ErroResponseDTO(403, e.getMessage()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErroResponseDTO> handleValidation(ConstraintViolationException e) {
-        String primeiraMensagem = e.getConstraintViolations()
+        String mensagem = e.getConstraintViolations()
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst()
                 .orElse("Erro de validação");
 
-        return ResponseEntity.badRequest().body(new ErroResponseDTO(400, primeiraMensagem));
+        return ResponseEntity.badRequest().body(new ErroResponseDTO(400, mensagem));
     }
 
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
