@@ -64,7 +64,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://31.97.22.121:5173"
+                "http://31.97.22.121:5173",
+                "https://curriculovt.com.br",
+                "https://www.curriculovt.com.br"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
