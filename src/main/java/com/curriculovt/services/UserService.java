@@ -85,7 +85,6 @@ public class UserService {
             if (!userDetails.getPassword().equals(userNoBanco.getPassword()) && !userDetails.getPassword().startsWith("$2a$")) {
                 validarSenhaForte(userDetails.getPassword());
                 userNoBanco.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-                // Se o próprio usuário está trocando a senha, removemos o flag de reset
                 userNoBanco.setSenhaRedefinidaPorEmail(false);
             }
         }

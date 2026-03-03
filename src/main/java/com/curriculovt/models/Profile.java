@@ -28,7 +28,6 @@ public class Profile {
     @Column(nullable = false, length = 100)
     private String nome;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String img;
 

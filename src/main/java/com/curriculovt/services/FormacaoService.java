@@ -3,6 +3,7 @@ package com.curriculovt.services;
 import com.curriculovt.dtos.FormacaoDTO;
 import com.curriculovt.exceptions.FormacaoNaoEncontradaException;
 import com.curriculovt.exceptions.ProfileNaoEncontradoException;
+import com.curriculovt.exceptions.ResourceNotFoundException;
 import com.curriculovt.models.Formacao;
 import com.curriculovt.models.Profile;
 import com.curriculovt.models.User;
@@ -52,13 +53,12 @@ public class FormacaoService {
     @Transactional(readOnly = true)
     public List<Formacao> listarPorProfile(Long profileId) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 
         return formacaoRepository.findByProfileIdOrderByDataFimDesc(profileId);
     }
-
     @Transactional
     public void excluir(Long id) {
         Formacao existente = buscarPorId(id);

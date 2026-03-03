@@ -55,22 +55,14 @@ public class ProfileService {
 
     @Transactional
     public void excluir(Long id) {
-        // 1. Busca o perfil ou estoura erro
         Profile existente = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNaoEncontradoException("Não foi possível excluir: Perfil não encontrado."));
 
-        // 2. Valida se o cabra é o dono mesmo
         validarPropriedade(existente.getUser().getId());
 
-        // 3. O PULO DO GATO: Limpa a referência no objeto User
-        // Como é @OneToOne, o User tem um campo 'profile'. Se não limpar, o Hibernate tenta manter vivo.
         User dono = existente.getUser();
-        dono.setProfile(null); // Corta o vínculo bidirecional
-
-        // 4. Agora sim, deleta sem dó
+        dono.setProfile(null);
         profileRepository.delete(existente);
-
-        // Dica extra: Se você usa cache de segundo nível, profileRepository.flush() pode ajudar aqui.
     }
     @Transactional(readOnly = true)
     public Profile buscarPorId(Long id) {

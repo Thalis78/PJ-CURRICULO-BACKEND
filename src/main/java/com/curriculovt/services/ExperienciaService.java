@@ -2,6 +2,7 @@ package com.curriculovt.services;
 
 import com.curriculovt.dtos.ExperienciaDTO;
 import com.curriculovt.exceptions.ExperienciaNaoEncontradaException;
+import com.curriculovt.exceptions.ResourceNotFoundException;
 import com.curriculovt.models.Profile;
 import com.curriculovt.models.Experiencia;
 import com.curriculovt.models.User;
@@ -28,7 +29,7 @@ public class ExperienciaService {
     @Transactional
     public Experiencia criar(Long profileId, ExperienciaDTO dto) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new RuntimeException("Perfil pai não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 
@@ -51,12 +52,13 @@ public class ExperienciaService {
     @Transactional(readOnly = true)
     public List<Experiencia> listarPorProfile(Long profileId) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 
         return experienciaRepository.findByProfileIdOrderByDataInicioDesc(profileId);
     }
+
     @Transactional
     public void excluir(Long id) {
         Experiencia existente = buscarPorId(id);
