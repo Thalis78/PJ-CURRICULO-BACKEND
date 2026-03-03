@@ -30,7 +30,7 @@ public class FormacaoService {
     @Transactional
     public Formacao criar(Long profileId, FormacaoDTO dto) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil pai não encontrado"));
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 

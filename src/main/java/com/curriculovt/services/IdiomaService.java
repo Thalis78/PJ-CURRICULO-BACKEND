@@ -29,7 +29,7 @@ public class IdiomaService {
     @Transactional
     public Idioma criar(Long profileId, IdiomaDTO dto) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil pai não encontrado"));
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 

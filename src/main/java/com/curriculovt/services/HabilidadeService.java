@@ -29,7 +29,7 @@ public class HabilidadeService {
     @Transactional
     public Habilidade criar(Long profileId, HabilidadeDTO dto) {
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil pai não encontrado"));
+                .orElseThrow(() -> new ProfileNaoEncontradoException("Perfil não encontrado ou excluído"));
 
         validarPropriedade(profile.getUser().getId());
 
