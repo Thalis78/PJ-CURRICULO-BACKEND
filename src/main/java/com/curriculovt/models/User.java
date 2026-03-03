@@ -30,7 +30,6 @@ public class User {
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotBlank(message = "A senha é obrigatória.")
     @Column(nullable = false)
     private String password;
 
@@ -49,7 +48,7 @@ public class User {
     private Profile profile;
 
     public boolean estaExpirado() {
-        if (this.dataExpiracao == null) return true;
+        if (this.dataExpiracao == null) return false;
         return this.dataExpiracao.isBefore(LocalDateTime.now());
     }
 }
