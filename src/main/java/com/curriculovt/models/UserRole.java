@@ -1,6 +1,6 @@
 package com.curriculovt.models;
 
 public enum UserRole {
-    ADMIN,
+    SUPER_ADMIN,
     COMMON
 }

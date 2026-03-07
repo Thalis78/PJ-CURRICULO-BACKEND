@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -27,12 +29,17 @@ public class UserController {
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(required = false) String filtro,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-
         return ResponseEntity.ok(userService.findAllCommon(filtro, pageable));
     }
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
+    }
+    @GetMapping("/metrics")
+    public ResponseEntity<Map<String, Long>> getDashboardMetrics(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        return ResponseEntity.ok(userService.getMetrics(year, month));
     }
 
     @PutMapping("/{id}")

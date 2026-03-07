@@ -2,7 +2,9 @@ package com.curriculovt.services;
 
 import com.curriculovt.exceptions.UserNaoEncontradoException;
 import com.curriculovt.models.User;
+import com.curriculovt.models.UserAuditLog;
 import com.curriculovt.models.UserRole;
+import com.curriculovt.repositorys.UserAuditLogRepository;
 import com.curriculovt.repositorys.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,10 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private UserAuditLogRepository auditRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -39,9 +46,7 @@ public class UserService {
     @Transactional
     public User saveUser(User user) {
         validarSenhaForte(user.getPassword());
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         user.setSenhaRedefinidaPorEmail(false);
 
         if (user.getEmail() != null) {
@@ -55,11 +60,13 @@ public class UserService {
             user.setDataExpiracao(null);
         }
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        auditRepository.save(new UserAuditLog(saved.getId(), "CRIACAO"));
+        return saved;
     }
 
     public Page<User> findAllCommon(String termo, Pageable pageable) {
-        validarAdmin();
+        validarSuperAdmin();
         if (termo != null && !termo.isBlank()) {
             return userRepository.findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
                     UserRole.COMMON, termo, UserRole.COMMON, termo, pageable);
@@ -68,7 +75,7 @@ public class UserService {
     }
 
     public User findById(Long id) {
-        validarPropriedadeOuAdmin(id);
+        validarPropriedadeOuSuperAdmin(id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
     }
@@ -79,30 +86,33 @@ public class UserService {
         User userNoBanco = userRepository.findById(id)
                 .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
 
-        validarPropriedadeOuAdmin(id);
+        validarPropriedadeOuSuperAdmin(id);
 
         if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank()) {
-            if (!userDetails.getPassword().equals(userNoBanco.getPassword()) && !userDetails.getPassword().startsWith("$2a$")) {
+            if (!passwordEncoder.matches(userDetails.getPassword(), userNoBanco.getPassword()) && !userDetails.getPassword().startsWith("$2a$")) {
                 validarSenhaForte(userDetails.getPassword());
                 userNoBanco.setPassword(passwordEncoder.encode(userDetails.getPassword()));
                 userNoBanco.setSenhaRedefinidaPorEmail(false);
+                auditRepository.save(new UserAuditLog(id, "ATUALIZACAO_SENHA"));
             }
         }
 
-        if (userDetails.getNome() != null) {
+        if (userDetails.getNome() != null && !userDetails.getNome().equals(userNoBanco.getNome())) {
             userNoBanco.setNome(userDetails.getNome());
         }
 
-        if (userDetails.getEmail() != null) {
+        if (userDetails.getEmail() != null && !userDetails.getEmail().equalsIgnoreCase(userNoBanco.getEmail())) {
             userNoBanco.setEmail(userDetails.getEmail().toLowerCase().trim());
+            auditRepository.save(new UserAuditLog(id, "ATUALIZACAO_EMAIL"));
         }
 
-        if (userLogado.getRole() == UserRole.ADMIN) {
+        if (userLogado.getRole() == UserRole.SUPER_ADMIN) {
             if (userDetails.getRole() != null) {
                 userNoBanco.setRole(userDetails.getRole());
             }
-            if (userDetails.getDataExpiracao() != null) {
+            if (userDetails.getDataExpiracao() != null && !userDetails.getDataExpiracao().equals(userNoBanco.getDataExpiracao())) {
                 userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
+                auditRepository.save(new UserAuditLog(id, "ATUALIZACAO_DATA"));
             }
         }
 
@@ -111,9 +121,45 @@ public class UserService {
 
     @Transactional
     public void delete(Long id) {
-        validarAdmin();
+        validarSuperAdmin();
         User user = findById(id);
         userRepository.delete(user);
+        auditRepository.save(new UserAuditLog(id, "EXCLUSAO"));
+    }
+
+    public Map<String, Long> getMetrics(Integer year, Integer month) {
+        validarSuperAdmin();
+
+        LocalDateTime inicio;
+        LocalDateTime fim;
+        LocalDateTime agora = LocalDateTime.now();
+
+        if (year != null && month != null) {
+            inicio = LocalDateTime.of(year, month, 3, 0, 0, 0);
+            fim = inicio.plusMonths(1);
+        } else {
+            if (agora.getDayOfMonth() >= 3) {
+                inicio = agora.withDayOfMonth(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
+                fim = inicio.plusMonths(1);
+            } else {
+                inicio = agora.minusMonths(1).withDayOfMonth(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
+                fim = inicio.plusMonths(1);
+            }
+        }
+
+        Map<String, Long> metrics = new HashMap<>();
+
+        metrics.put("criados", auditRepository.countByAcaoAndDataEventoBetween("CRIACAO", inicio, fim));
+        metrics.put("atualizacoesSenha", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim));
+        metrics.put("atualizacoesEmail", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_EMAIL", inicio, fim));
+        metrics.put("atualizacoesData", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_DATA", inicio, fim));
+        metrics.put("excluidos", auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim));
+
+        metrics.put("totalAtivos", userRepository.countByRoleAndDataExpiracaoAfter(UserRole.COMMON, agora));
+
+        metrics.put("expirados", userRepository.countByRoleAndDataExpiracaoBetween(UserRole.COMMON, inicio, fim));
+
+        return metrics;
     }
 
     public Optional<User> findByEmail(String email) {
@@ -124,15 +170,17 @@ public class UserService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    private void validarAdmin() {
-        if (getUsuarioLogado().getRole() != UserRole.ADMIN) {
-            throw new AccessDeniedException("Acesso negado: Requer privilégios de administrador.");
+    private void validarSuperAdmin() {
+        UserRole role = getUsuarioLogado().getRole();
+        if (role != UserRole.SUPER_ADMIN) {
+            throw new AccessDeniedException("Acesso negado: Requer privilégios de Super Admin.");
         }
     }
 
-    private void validarPropriedadeOuAdmin(Long idAlvo) {
+    private void validarPropriedadeOuSuperAdmin(Long idAlvo) {
         User logado = getUsuarioLogado();
-        if (logado.getRole() != UserRole.ADMIN && !logado.getId().equals(idAlvo)) {
+        boolean isSuperAdmin = logado.getRole() == UserRole.SUPER_ADMIN;
+        if (!isSuperAdmin && !logado.getId().equals(idAlvo)) {
             throw new AccessDeniedException("Acesso negado: Sem permissão para este usuário.");
         }
     }

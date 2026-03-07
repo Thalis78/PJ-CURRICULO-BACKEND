@@ -41,10 +41,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_COMMON")
-                        .requestMatchers(HttpMethod.PUT, "/users/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_COMMON")
+                        .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
 
-                        .requestMatchers("/users", "/users/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
+                        .requestMatchers(HttpMethod.PUT, "/users/{id}").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
+
+                        .requestMatchers("/users", "/users/**").hasAuthority("ROLE_SUPER_ADMIN")
 
                         .requestMatchers(
                                 "/profiles", "/profiles/**",
@@ -52,7 +55,8 @@ public class SecurityConfig {
                                 "/formacoes", "/formacoes/**",
                                 "/habilidades", "/habilidades/**",
                                 "/idiomas", "/idiomas/**"
-                        ).hasAuthority("ROLE_COMMON")
+                        ).hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -69,7 +73,7 @@ public class SecurityConfig {
                 "https://www.curriculovt.com.br"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
