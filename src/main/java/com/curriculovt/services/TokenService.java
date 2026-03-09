@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 
 @Service
@@ -33,15 +34,15 @@ public class TokenService {
     }
 
     private Instant genExpirationDate(User user) {
-        LocalDateTime dataLimiteSessao = LocalDateTime.now().plusHours(2);
+        LocalDateTime hojeMeiaNoite = LocalDateTime.now().with(LocalTime.MAX);
 
         if (user.getRole() == UserRole.COMMON && user.getDataExpiracao() != null) {
-            if (user.getDataExpiracao().isBefore(dataLimiteSessao)) {
+            if (user.getDataExpiracao().isBefore(hojeMeiaNoite)) {
                 return user.getDataExpiracao().toInstant(ZoneOffset.of("-03:00"));
             }
         }
 
-        return dataLimiteSessao.toInstant(ZoneOffset.of("-03:00"));
+        return hojeMeiaNoite.toInstant(ZoneOffset.of("-03:00"));
     }
 
     public String validateToken(String token) {
