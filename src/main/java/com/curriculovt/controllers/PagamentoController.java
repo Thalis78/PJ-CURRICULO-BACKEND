@@ -41,6 +41,9 @@ public class PagamentoController {
             paymentIdStr = String.valueOf(data.get("id"));
         }
 
+        System.out.println("--- NOVO WEBHOOK RECEBIDO ---");
+        System.out.println("Ação: " + action + " | ID Pagamento: " + paymentIdStr);
+
         if (paymentIdStr != null && ("payment.updated".equals(action) || "payment.created".equals(action))) {
             try {
                 PaymentClient client = new PaymentClient();
@@ -49,11 +52,14 @@ public class PagamentoController {
                 String usuarioId = payment.getExternalReference();
                 String status = payment.getStatus();
 
+                System.out.println("Status: " + status + " | User ID: " + usuarioId);
+
                 if ("approved".equals(status) && usuarioId != null) {
+                    System.out.println("PAGAMENTO APROVADO! Ativando assinatura...");
                     userService.adicionarMesDeAssinatura(Long.parseLong(usuarioId));
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                System.err.println("Erro ao processar pagamento: " + e.getMessage());
             }
         }
 
