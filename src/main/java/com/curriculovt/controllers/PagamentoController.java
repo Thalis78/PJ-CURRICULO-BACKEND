@@ -24,7 +24,13 @@ public class PagamentoController {
 
     @PostMapping("/checkout")
     public ResponseEntity<String> realizarPagamento(@RequestBody CheckoutRequestDTO request) {
-        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId());
+        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "pagamento");
+        return ResponseEntity.ok(url);
+    }
+
+    @PostMapping("/checkout-renovacao")
+    public ResponseEntity<String> realizarRenovacao(@RequestBody CheckoutRequestDTO request) {
+        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "sessao-expirada");
         return ResponseEntity.ok(url);
     }
 

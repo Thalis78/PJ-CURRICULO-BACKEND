@@ -47,6 +47,11 @@ public class AuthController {
                     errorResponse.put("mensagem", "Sua assinatura expirou.");
                     errorResponse.put("status", "EXPIRADO");
                     errorResponse.put("dataExpiracao", user.getDataExpiracao());
+
+                    errorResponse.put("id", user.getId());
+                    errorResponse.put("nome", user.getNome());
+                    errorResponse.put("role", user.getRole());
+
                     return ResponseEntity.status(403).body(errorResponse);
                 }
 
@@ -92,7 +97,6 @@ public class AuthController {
         }
     }
 
-    // ... outros imports
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe(@RequestHeader("Authorization") String authorizationHeader) {
@@ -115,7 +119,7 @@ public class AuthController {
                 response.put("nome", user.getNome());
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole());
-                response.put("pagamento", user.isPagamento()); // O front vai olhar isso aqui!
+                response.put("pagamento", user.isPagamento());
                 response.put("dataExpiracao", user.getDataExpiracao());
 
                 return ResponseEntity.ok(response);

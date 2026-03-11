@@ -11,13 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class PagamentoService {
 
-    public String gerarLinkDePagamento(String usuarioId) {
+    public String gerarLinkDePagamento(String usuarioId, String contexto) {
         MercadoPagoConfig.setAccessToken("APP_USR-3675438486844546-031012-b96b0c111869bc2b0e8eab7d08a784b7-325277454");
+
+        String backUrl = "https://curriculovt.com.br/" + contexto;
 
         PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                 .id("premium_plan")
                 .title("Plano Premium Curriculo_vt")
-                .description("Criação de currículo profissional")
+                .description("Acesso ao sistema de currículos")
                 .quantity(1)
                 .unitPrice(new BigDecimal("0.05"))
                 .build();
@@ -26,9 +28,9 @@ public class PagamentoService {
         items.add(itemRequest);
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("https://curriculovt.com.br/pagamento")
-                .pending("https://curriculovt.com.br/pagamento")
-                .failure("https://curriculovt.com.br/pagamento")
+                .success(backUrl)
+                .pending(backUrl)
+                .failure(backUrl)
                 .build();
 
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
