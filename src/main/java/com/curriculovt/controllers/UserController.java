@@ -25,16 +25,25 @@ public class UserController {
         return new ResponseEntity<>(userService.saveUser(user), HttpStatus.CREATED);
     }
 
+    @PostMapping("/ativar-assinatura")
+    public ResponseEntity<Void> ativarAssinatura(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        userService.adicionarMesDeAssinatura(email);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(required = false) String filtro,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(userService.findAllCommon(filtro, pageable));
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
+
     @GetMapping("/metrics")
     public ResponseEntity<Map<String, Long>> getDashboardMetrics(
             @RequestParam(required = false) Integer year,

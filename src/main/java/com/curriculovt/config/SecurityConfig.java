@@ -40,7 +40,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/forgot-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/pagamentos/webhook").permitAll()
 
+                        .requestMatchers("/pagamentos/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
                         .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
 
@@ -62,7 +64,6 @@ public class SecurityConfig {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

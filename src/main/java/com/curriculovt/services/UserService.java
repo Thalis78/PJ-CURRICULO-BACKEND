@@ -53,16 +53,25 @@ public class UserService {
             user.setEmail(user.getEmail().toLowerCase().trim());
         }
 
-        if (user.getRole() == UserRole.COMMON) {
-            LocalDateTime dataExpiracaoCalculada = LocalDateTime.now().plusMonths(1);
-            user.setDataExpiracao(ajustarParaFinalDoDia(dataExpiracaoCalculada));
-        } else {
-            user.setDataExpiracao(null);
-        }
+        user.setPagamento(false);
+        user.setDataExpiracao(null);
 
         User saved = userRepository.save(user);
         auditRepository.save(new UserAuditLog(saved.getId(), "CRIACAO"));
         return saved;
+    }
+
+    @Transactional
+    public void adicionarMesDeAssinatura(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
+
+        user.setPagamento(true);
+        LocalDateTime novaExpiracao = LocalDateTime.now().plusMonths(1);
+        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
+
+        userRepository.save(user);
+        auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
     }
 
     public Page<User> findAllCommon(String termo, Pageable pageable) {

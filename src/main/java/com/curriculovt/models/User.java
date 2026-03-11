@@ -43,12 +43,11 @@ public class User {
     @Column(name = "senha_redefinida_por_email", nullable = false)
     private boolean senhaRedefinidaPorEmail = false;
 
+    @Column(nullable = false)
+    private boolean pagamento = false;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Profile profile;
 
-    public boolean estaExpirado() {
-        if (this.dataExpiracao == null) return false;
-        return this.dataExpiracao.isBefore(LocalDateTime.now());
-    }
 }
