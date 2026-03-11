@@ -50,6 +50,7 @@ public class AuthController {
                     errorResponse.put("mensagem", "Sua assinatura expirou.");
                     errorResponse.put("status", "EXPIRADO");
                     errorResponse.put("dataExpiracao", user.getDataExpiracao());
+                    errorResponse.put("pagamento", false);
                     errorResponse.put("id", user.getId());
                     errorResponse.put("nome", user.getNome());
                     errorResponse.put("role", user.getRole());
