@@ -26,7 +26,7 @@ public class PagamentoService {
         items.add(itemRequest);
 
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success("https://curriculovt.com.br/profile")
+                .success("https://curriculovt.com.br/pagamento")
                 .pending("https://curriculovt.com.br/pagamento")
                 .failure("https://curriculovt.com.br/pagamento")
                 .build();
