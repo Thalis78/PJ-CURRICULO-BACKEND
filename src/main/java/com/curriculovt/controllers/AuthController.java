@@ -43,11 +43,13 @@ public class AuthController {
             if (passwordEncoder.matches(data.getPassword(), user.getPassword())) {
 
                 if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
+                    String token = tokenService.generateToken(user);
+
                     Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("token", token); // <--- O TOKEN QUE FALTA
                     errorResponse.put("mensagem", "Sua assinatura expirou.");
                     errorResponse.put("status", "EXPIRADO");
                     errorResponse.put("dataExpiracao", user.getDataExpiracao());
-
                     errorResponse.put("id", user.getId());
                     errorResponse.put("nome", user.getNome());
                     errorResponse.put("role", user.getRole());
@@ -74,7 +76,6 @@ public class AuthController {
         errorResponse.put("mensagem", "E-mail ou senha inválidos");
         return ResponseEntity.status(401).body(errorResponse);
     }
-
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
