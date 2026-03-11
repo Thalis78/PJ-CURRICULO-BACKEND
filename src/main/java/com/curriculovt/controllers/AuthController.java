@@ -46,7 +46,7 @@ public class AuthController {
                     String token = tokenService.generateToken(user);
 
                     Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("token", token); // <--- O TOKEN QUE FALTA
+                    errorResponse.put("token", token);
                     errorResponse.put("mensagem", "Sua assinatura expirou.");
                     errorResponse.put("status", "EXPIRADO");
                     errorResponse.put("dataExpiracao", user.getDataExpiracao());

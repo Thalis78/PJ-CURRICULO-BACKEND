@@ -25,7 +25,7 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("curriculo-vt")
                     .withSubject(user.getEmail())
-                    .withClaim("role", user.getRole().toString())
+                    .withClaim("role", "ROLE_" + user.getRole().toString())
                     .withExpiresAt(genExpirationDate(user))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
@@ -34,15 +34,11 @@ public class TokenService {
     }
 
     private Instant genExpirationDate(User user) {
-        LocalDateTime hojeMeiaNoite = LocalDateTime.now().with(LocalTime.MAX);
-
-        if (user.getRole() == UserRole.COMMON && user.getDataExpiracao() != null) {
-            if (user.getDataExpiracao().isBefore(hojeMeiaNoite)) {
-                return user.getDataExpiracao().toInstant(ZoneOffset.of("-03:00"));
-            }
+        if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
+            return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
         }
 
-        return hojeMeiaNoite.toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().with(LocalTime.MAX).toInstant(ZoneOffset.of("-03:00"));
     }
 
     public String validateToken(String token) {
