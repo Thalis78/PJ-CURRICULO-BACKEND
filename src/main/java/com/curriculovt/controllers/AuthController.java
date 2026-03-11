@@ -91,4 +91,40 @@ public class AuthController {
             return ResponseEntity.status(404).body(response);
         }
     }
+
+    // ... outros imports
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String token = authorizationHeader.replace("Bearer ", "");
+
+            String email = tokenService.validateToken(token);
+
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of("mensagem", "Token inválido"));
+            }
+
+            Optional<User> userOptional = userService.findByEmail(email);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("id", user.getId());
+                response.put("nome", user.getNome());
+                response.put("email", user.getEmail());
+                response.put("role", user.getRole());
+                response.put("pagamento", user.isPagamento()); // O front vai olhar isso aqui!
+                response.put("dataExpiracao", user.getDataExpiracao());
+
+                return ResponseEntity.ok(response);
+            }
+
+            return ResponseEntity.status(404).body(Map.of("mensagem", "Usuário não encontrado"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("mensagem", "Token expirado ou inválido"));
+        }
+    }
 }

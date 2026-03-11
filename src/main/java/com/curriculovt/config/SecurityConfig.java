@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/pagamentos/webhook").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/auth/me").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
                         .requestMatchers("/pagamentos/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
                         .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
