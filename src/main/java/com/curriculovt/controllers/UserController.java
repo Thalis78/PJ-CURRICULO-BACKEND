@@ -26,9 +26,16 @@ public class UserController {
     }
 
     @PostMapping("/ativar-assinatura")
-    public ResponseEntity<Void> ativarAssinatura(@RequestBody Map<String, String> payload) {
-        String email = payload.get("email");
-        userService.adicionarMesDeAssinatura(email);
+    public ResponseEntity<Void> ativarAssinatura(@RequestBody Map<String, Object> payload) {
+        Object idObj = payload.get("usuarioId");
+
+        if (idObj == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Long usuarioId = Long.parseLong(String.valueOf(idObj));
+        userService.adicionarMesDeAssinatura(usuarioId);
+
         return ResponseEntity.ok().build();
     }
 
