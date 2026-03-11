@@ -65,6 +65,7 @@ public class AuthController {
                 response.put("nome", user.getNome());
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole());
+                response.put("pagamento", user.isPagamento());
                 response.put("dataExpiracao", user.getDataExpiracao());
                 response.put("senhaRedefinidaPorEmail", user.isSenhaRedefinidaPorEmail());
 
