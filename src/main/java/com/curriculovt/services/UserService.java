@@ -62,8 +62,8 @@ public class UserService {
     }
 
     @Transactional
-    public void adicionarMesDeAssinatura(String email) {
-        User user = userRepository.findByEmail(email)
+    public void adicionarMesDeAssinatura(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
 
         user.setPagamento(true);
