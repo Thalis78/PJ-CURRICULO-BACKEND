@@ -124,7 +124,7 @@ public class AuthController {
                 response.put("role", user.getRole());
                 response.put("pagamento", user.isPagamento());
                 response.put("dataExpiracao", user.getDataExpiracao());
-
+                response.put("senhaRedefinidaPorEmail", user.isSenhaRedefinidaPorEmail());
                 return ResponseEntity.ok(response);
             }
 
