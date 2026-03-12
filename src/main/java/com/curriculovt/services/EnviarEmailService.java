@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,8 @@ public class EnviarEmailService {
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
             message.setSubject(assunto);
-            message.setText(mensagem);
+
+            message.setContent(mensagem, "text/html; charset=utf-8");
 
             Transport.send(message);
             System.out.println("Email enviado para: " + destinatario);
@@ -81,7 +81,7 @@ public class EnviarEmailService {
 
     public void resetarSenha(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email nao encontrado no sistema."));
+                .orElseThrow(() -> new RuntimeException("E-mail não encontrado no sistema."));
 
         String senhaLimpa = gerarNovaSenha();
 
@@ -90,13 +90,56 @@ public class EnviarEmailService {
 
         userRepository.save(user);
 
-        String assunto = "Reset de Senha - Curriculo VT";
-        String mensagem = "Ola, " + user.getNome() + "\n\n" +
-                "Voce solicitou a recuperacao de senha para sua conta no Curriculo VT.\n\n" +
-                "Sua senha temporaria e: " + senhaLimpa + "\n\n" +
-                "Importante: Ao fazer login, o sistema solicitara que voce crie uma nova senha definitiva.\n\n" +
-                "Atenciosamente,\nEquipe Curriculo VT";
+        String assunto = "Recuperação de Senha - Currículo VT";
 
-        enviarEmail(email, assunto, mensagem);
+        String corpoHtml = "<!doctype html>" +
+                "<html lang='pt-br'>" +
+                "  <head>" +
+                "    <meta charset='UTF-8' />" +
+                "    <meta name='viewport' content='width=device-width, initial-scale=1.0' />" +
+                "  </head>" +
+                "  <body style='margin: 0; padding: 0; background-color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;'>" +
+                "    <table role='presentation' border='0' cellpadding='0' cellspacing='0' width='100%'>" +
+                "      <tr>" +
+                "        <td align='center' style='padding: 40px 10px'>" +
+                "          <div style='max-width: 500px; width: 100%; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb;'>" +
+                "            <div style='background-color: #ffffff; padding: 35px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;'>" +
+                "              <div style='display: inline-block; vertical-align: middle; line-height: 1;'>" +
+                "                <span style='color: #18181b; font-size: 22px; font-weight: bold; letter-spacing: -0.5px; text-transform: uppercase;'>CURRÍCULO</span>" +
+                "                <span style='color: #2563eb; font-size: 22px; font-weight: 900; font-style: italic; letter-spacing: -1px; margin-left: 4px;'>VT</span>" +
+                "              </div>" +
+                "            </div>" +
+                "            <div style='padding: 40px 35px; color: #374151'>" +
+                "              <h2 style='margin: 0 0 15px 0; color: #111827; font-size: 22px; font-weight: 700; text-align: center;'>Olá, " + user.getNome() + "!</h2>" +
+                "              <p style='margin: 0 0 25px 0; font-size: 16px; line-height: 1.6; color: #4b5563; text-align: center;'>" +
+                "                Recebemos uma solicitação para redefinir sua senha. Utilize o código temporário abaixo para acessar sua conta:" +
+                "              </p>" +
+                "              <div style='background-color: #f8fafc; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 30px; border: 2px dashed #cbd5e1;'>" +
+                "                <div style='font-size: 11px; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; letter-spacing: 0.1em;'>Sua senha temporária</div>" +
+                "                <div style='font-family: monospace; font-size: 24px; font-weight: bold; color: #2563eb;'>" + senhaLimpa + "</div>" +
+                "              </div>" +
+                "              <div style='background-color: #eff6ff; padding: 16px; border-radius: 8px; border-left: 4px solid #2563eb; margin-bottom: 30px;'>" +
+                "                <p style='margin: 0; font-size: 14px; line-height: 1.5; color: #1e40af;'>" +
+                "                  <strong>Atenção:</strong> Por motivos de segurança, ao realizar o próximo login, o sistema exigirá que você cadastre uma nova senha definitiva." +
+                "                </p>" +
+                "              </div>" +
+                "              <div style='text-align: center'>" +
+                "                <a href='https://curriculovt.com.br/login' style='display: inline-block; background-color: #2563eb; color: #ffffff; padding: 14px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 15px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);'>Acessar login</a>" +
+                "              </div>" +
+                "            </div>" +
+                "            <div style='background-color: #f9fafb; padding: 25px; text-align: center; border-top: 1px solid #e5e7eb;'>" +
+                "              <p style='margin: 0; font-size: 12px; color: #9ca3af; line-height: 1.5;'>Se você não solicitou esta mudança, pode ignorar este e-mail com segurança.</p>" +
+                "              <p style='margin: 12px 0 0 0; font-size: 11px; color: #6b7280; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;'>" +
+                "                Equipe Currículo <span style='color: #2563eb'>VT</span>" +
+                "              </p>" +
+                "            </div>" +
+                "          </div>" +
+                "        </td>" +
+                "      </tr>" +
+                "    </table>" +
+                "  </body>" +
+                "</html>";
+
+        enviarEmail(email, assunto, corpoHtml);
     }
 }
