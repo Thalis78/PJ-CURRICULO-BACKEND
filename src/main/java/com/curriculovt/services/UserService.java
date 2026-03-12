@@ -161,32 +161,34 @@ public class UserService {
         long excluidos = auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim);
 
         double valorVenda = 11.0;
-        double taxaML = 0.004;
+        double taxaML = 0.44;
+        double valorLiquidoUnitario = valorVenda - taxaML; // 10.56
 
-        long saldoUsuariosPeriodo = criados - excluidos;
+        long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
+        long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);
 
-        double faturamentoBruto = saldoUsuariosPeriodo * valorVenda;
+        double faturamentoBruto = totalAtivos * valorVenda;
+        double faturamentoLiquido = totalAtivos * valorLiquidoUnitario;
 
-        double faturamentoLiquido = faturamentoBruto * (1 - taxaML);
+        double perdaPorExclusoes = excluidos * (valorVenda + taxaML);
 
         Map<String, Object> metrics = new HashMap<>();
 
         metrics.put("criados", criados);
         metrics.put("atualizacoesSenha", atualizacoesSenha);
         metrics.put("excluidos", excluidos);
+        metrics.put("perdaPorExclusoes", perdaPorExclusoes);
 
         metrics.put("faturamentoBruto", faturamentoBruto);
         metrics.put("faturamentoLiquido", faturamentoLiquido);
 
+        metrics.put("totalUsuarios", userRepository.countByRole(UserRole.COMMON));
         metrics.put("totalAdmins", userRepository.countByRole(UserRole.SUPER_ADMIN));
-
-        metrics.put("totalAtivos", userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora));
-
-        metrics.put("totalInativos", userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora));
+        metrics.put("totalAtivos", totalAtivos);
+        metrics.put("totalInativos", totalInativos);
 
         return metrics;
     }
-
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
