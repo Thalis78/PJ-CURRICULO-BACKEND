@@ -20,7 +20,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
             UserRole role1, String nome, UserRole role2, String email, Pageable pageable);
 
-    long countByRoleAndDataExpiracaoAfter(UserRole role, LocalDateTime agora);
+    long countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole role, LocalDateTime data);
 
-    long countByRoleAndDataExpiracaoBetween(UserRole role, LocalDateTime inicio, LocalDateTime fim);
+    long countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole role, LocalDateTime data);
+
+    long countByRole(UserRole role);
 }

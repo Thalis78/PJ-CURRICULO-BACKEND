@@ -57,7 +57,9 @@ public class UserService {
         user.setDataExpiracao(null);
 
         User saved = userRepository.save(user);
-        auditRepository.save(new UserAuditLog(saved.getId(), "CRIACAO"));
+        if (saved.getRole() == UserRole.COMMON) {
+            auditRepository.save(new UserAuditLog(saved.getId(), "CRIACAO"));
+        }
         return saved;
     }
 
@@ -112,7 +114,6 @@ public class UserService {
 
         if (userDetails.getEmail() != null && !userDetails.getEmail().equalsIgnoreCase(userNoBanco.getEmail())) {
             userNoBanco.setEmail(userDetails.getEmail().toLowerCase().trim());
-            auditRepository.save(new UserAuditLog(id, "ATUALIZACAO_EMAIL"));
         }
 
         if (userLogado.getRole() == UserRole.SUPER_ADMIN) {
@@ -121,7 +122,6 @@ public class UserService {
             }
             if (userDetails.getDataExpiracao() != null && !userDetails.getDataExpiracao().equals(userNoBanco.getDataExpiracao())) {
                 userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
-                auditRepository.save(new UserAuditLog(id, "ATUALIZACAO_DATA"));
             }
         }
 
@@ -136,7 +136,7 @@ public class UserService {
         auditRepository.save(new UserAuditLog(id, "EXCLUSAO"));
     }
 
-    public Map<String, Long> getMetrics(Integer year, Integer month) {
+    public Map<String, Object> getMetrics(Integer year, Integer month) {
         validarSuperAdmin();
 
         LocalDateTime inicio;
@@ -156,17 +156,33 @@ public class UserService {
             }
         }
 
-        Map<String, Long> metrics = new HashMap<>();
+        long criados = auditRepository.countByAcaoAndDataEventoBetween("CRIACAO", inicio, fim);
+        long atualizacoesSenha = auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim);
+        long excluidos = auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim);
 
-        metrics.put("criados", auditRepository.countByAcaoAndDataEventoBetween("CRIACAO", inicio, fim));
-        metrics.put("atualizacoesSenha", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim));
-        metrics.put("atualizacoesEmail", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_EMAIL", inicio, fim));
-        metrics.put("atualizacoesData", auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_DATA", inicio, fim));
-        metrics.put("excluidos", auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim));
+        double valorVenda = 11.0;
+        double taxaML = 0.004;
 
-        metrics.put("totalAtivos", userRepository.countByRoleAndDataExpiracaoAfter(UserRole.COMMON, agora));
+        long saldoUsuariosPeriodo = criados - excluidos;
 
-        metrics.put("expirados", userRepository.countByRoleAndDataExpiracaoBetween(UserRole.COMMON, inicio, fim));
+        double faturamentoBruto = saldoUsuariosPeriodo * valorVenda;
+
+        double faturamentoLiquido = faturamentoBruto * (1 - taxaML);
+
+        Map<String, Object> metrics = new HashMap<>();
+
+        metrics.put("criados", criados);
+        metrics.put("atualizacoesSenha", atualizacoesSenha);
+        metrics.put("excluidos", excluidos);
+
+        metrics.put("faturamentoBruto", faturamentoBruto);
+        metrics.put("faturamentoLiquido", faturamentoLiquido);
+
+        metrics.put("totalAdmins", userRepository.countByRole(UserRole.SUPER_ADMIN));
+
+        metrics.put("totalAtivos", userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora));
+
+        metrics.put("totalInativos", userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora));
 
         return metrics;
     }
