@@ -4,6 +4,7 @@ import com.curriculovt.dtos.HabilidadeDTO;
 import com.curriculovt.models.Habilidade;
 import com.curriculovt.services.HabilidadeService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,8 @@ import java.util.List;
 @RequestMapping("/habilidades")
 public class HabilidadeController {
 
-    private final HabilidadeService habilidadeService;
-
-    public HabilidadeController(HabilidadeService habilidadeService) {
-        this.habilidadeService = habilidadeService;
-    }
+    @Autowired
+    private HabilidadeService habilidadeService;
 
     @PostMapping("/profile/{profileId}")
     public ResponseEntity<Habilidade> criar(

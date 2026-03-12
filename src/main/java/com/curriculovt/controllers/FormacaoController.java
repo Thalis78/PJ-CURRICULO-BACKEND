@@ -4,6 +4,7 @@ import com.curriculovt.dtos.FormacaoDTO;
 import com.curriculovt.models.Formacao;
 import com.curriculovt.services.FormacaoService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,8 @@ import java.util.List;
 @RequestMapping("/formacoes")
 public class FormacaoController {
 
-    private final FormacaoService formacaoService;
-
-    public FormacaoController(FormacaoService formacaoService) {
-        this.formacaoService = formacaoService;
-    }
+    @Autowired
+    private FormacaoService formacaoService;
 
     @PostMapping("/profile/{profileId}")
     public ResponseEntity<Formacao> criar(

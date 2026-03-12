@@ -5,6 +5,7 @@ import com.curriculovt.services.PagamentoService;
 import com.curriculovt.services.UserService;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.resources.payment.Payment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +15,11 @@ import java.util.Map;
 @RequestMapping("/pagamentos")
 public class PagamentoController {
 
-    private final PagamentoService pagamentoService;
-    private final UserService userService;
+    @Autowired
+    private PagamentoService pagamentoService;
 
-    public PagamentoController(PagamentoService pagamentoService, UserService userService) {
-        this.pagamentoService = pagamentoService;
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/checkout")
     public ResponseEntity<String> realizarPagamento(@RequestBody CheckoutRequestDTO request) {

@@ -4,6 +4,7 @@ import com.curriculovt.dtos.IdiomaDTO;
 import com.curriculovt.models.Idioma;
 import com.curriculovt.services.IdiomaService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,8 @@ import java.util.List;
 @RequestMapping("/idiomas")
 public class IdiomaController {
 
-    private final IdiomaService idiomaService;
-
-    public IdiomaController(IdiomaService idiomaService) {
-        this.idiomaService = idiomaService;
-    }
+    @Autowired
+    private IdiomaService idiomaService;
 
     @PostMapping("/profile/{profileId}")
     public ResponseEntity<Idioma> criar(

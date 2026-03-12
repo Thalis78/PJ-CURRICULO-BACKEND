@@ -3,8 +3,8 @@ package com.curriculovt.controllers;
 import com.curriculovt.dtos.ProfileDTO;
 import com.curriculovt.models.Profile;
 import com.curriculovt.services.ProfileService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/profiles")
 public class ProfileController {
 
-    private final ProfileService profileService;
-
-    public ProfileController(ProfileService profileService) {
-        this.profileService = profileService;
-    }
+    @Autowired
+    private ProfileService profileService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Profile> buscarPorId(@PathVariable Long id) {

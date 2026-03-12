@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/metrics")
-    public ResponseEntity<Map<String, Long>> getDashboardMetrics(
+    public ResponseEntity<Map<String, Object>> getDashboardMetrics(
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month) {
         return ResponseEntity.ok(userService.getMetrics(year, month));

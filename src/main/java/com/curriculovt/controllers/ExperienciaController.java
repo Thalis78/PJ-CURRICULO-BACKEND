@@ -4,6 +4,7 @@ import com.curriculovt.dtos.ExperienciaDTO;
 import com.curriculovt.models.Experiencia;
 import com.curriculovt.services.ExperienciaService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,8 @@ import java.util.List;
 @RequestMapping("/experiencias")
 public class ExperienciaController {
 
-    private final ExperienciaService experienciaService;
-
-    public ExperienciaController(ExperienciaService experienciaService) {
-        this.experienciaService = experienciaService;
-    }
+    @Autowired
+    private ExperienciaService experienciaService;
 
     @PostMapping("/profile/{profileId}")
     public ResponseEntity<Experiencia> criar(
