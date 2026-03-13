@@ -43,7 +43,7 @@ public class UserController {
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(required = false) String filtro,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(userService.findAllCommon(filtro, pageable));
+        return ResponseEntity.ok(userService.findAll(filtro, pageable));
     }
 
     @GetMapping("/{id}")

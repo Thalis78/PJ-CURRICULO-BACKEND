@@ -76,13 +76,15 @@ public class UserService {
         auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
     }
 
-    public Page<User> findAllCommon(String termo, Pageable pageable) {
+    public Page<User> findAll(String termo, Pageable pageable) {
         validarSuperAdmin();
+
         if (termo != null && !termo.isBlank()) {
-            return userRepository.findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
-                    UserRole.COMMON, termo, UserRole.COMMON, termo, pageable);
+            return userRepository.findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                    termo, termo, pageable);
         }
-        return userRepository.findByRole(UserRole.COMMON, pageable);
+
+        return userRepository.findAll(pageable);
     }
 
     public User findById(Long id) {

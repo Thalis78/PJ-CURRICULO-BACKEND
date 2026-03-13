@@ -15,10 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    Page<User> findByRole(UserRole role, Pageable pageable);
-
-    Page<User> findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
-            UserRole role1, String nome, UserRole role2, String email, Pageable pageable);
+    Page<User> findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(String nome, String email, Pageable pageable);
 
     long countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole role, LocalDateTime data);
 
