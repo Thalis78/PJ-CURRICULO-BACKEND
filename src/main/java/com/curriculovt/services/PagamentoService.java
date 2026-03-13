@@ -21,7 +21,7 @@ public class PagamentoService {
                 .title("Plano Premium Curriculo_vt")
                 .description("Acesso ao sistema de currículos")
                 .quantity(1)
-                .unitPrice(new BigDecimal("0.05"))
+                .unitPrice(new BigDecimal("11.00"))
                 .build();
 
         List<PreferenceItemRequest> items = new ArrayList<>();
@@ -33,11 +33,22 @@ public class PagamentoService {
                 .failure(backUrl)
                 .build();
 
+        List<PreferencePaymentTypeRequest> excludedTypes = new ArrayList<>();
+        excludedTypes.add(PreferencePaymentTypeRequest.builder().id("credit_card").build());
+        excludedTypes.add(PreferencePaymentTypeRequest.builder().id("debit_card").build());
+        excludedTypes.add(PreferencePaymentTypeRequest.builder().id("ticket").build());
+
+        PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()
+                .excludedPaymentTypes(excludedTypes)
+                .installments(1)
+                .build();
+
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
                 .backUrls(backUrls)
                 .externalReference(usuarioId)
                 .autoReturn("approved")
+                .paymentMethods(paymentMethods)
                 .build();
 
         PreferenceClient client = new PreferenceClient();
