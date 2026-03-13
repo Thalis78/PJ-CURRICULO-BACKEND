@@ -129,6 +129,23 @@ public class UserService {
     }
 
     @Transactional
+    public void ativarPagamento(Long userId) {
+        validarSuperAdmin();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
+
+        user.setPagamento(true);
+
+        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(30);
+        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
+
+        userRepository.save(user);
+
+        auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
+    }
+
+    @Transactional
     public void delete(Long id) {
         validarSuperAdmin();
         User user = findById(id);
@@ -161,8 +178,8 @@ public class UserService {
         long excluidos = auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim);
 
         double valorVenda = 11.0;
-        double taxaML = 0.44;
-        double valorLiquidoUnitario = valorVenda - taxaML; // 10.56
+        double taxaML = 0.11;
+        double valorLiquidoUnitario = valorVenda - taxaML;
 
         long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
         long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);

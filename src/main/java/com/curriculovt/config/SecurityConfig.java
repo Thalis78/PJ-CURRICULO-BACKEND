@@ -41,15 +41,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/pagamentos/webhook").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/me").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
-                        .requestMatchers("/pagamentos/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
+
                         .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users/ativar-pagamento").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers("/users", "/users/**").hasAuthority("ROLE_SUPER_ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/auth/me").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
+                        .requestMatchers("/pagamentos/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
                         .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
                         .requestMatchers(HttpMethod.PUT, "/users/{id}").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
 
-                        .requestMatchers("/users", "/users/**").hasAuthority("ROLE_SUPER_ADMIN")
 
                         .requestMatchers(
                                 "/profiles", "/profiles/**",
