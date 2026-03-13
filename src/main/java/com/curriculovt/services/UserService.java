@@ -76,17 +76,25 @@ public class UserService {
         auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
     }
 
-    public Page<User> findAll(String termo, Pageable pageable) {
+    public Page<User> findAll(String termo, UserRole role, Pageable pageable) {
         validarSuperAdmin();
+
+        if (termo != null && !termo.isBlank() && role != null) {
+            return userRepository.findByRoleAndNomeContainingIgnoreCaseOrRoleAndEmailContainingIgnoreCase(
+                    role, termo, role, termo, pageable);
+        }
 
         if (termo != null && !termo.isBlank()) {
             return userRepository.findByNomeContainingIgnoreCaseOrEmailContainingIgnoreCase(
                     termo, termo, pageable);
         }
 
+        if (role != null) {
+            return userRepository.findByRole(role, pageable);
+        }
+
         return userRepository.findAll(pageable);
     }
-
     public User findById(Long id) {
         validarPropriedadeOuSuperAdmin(id);
         return userRepository.findById(id)

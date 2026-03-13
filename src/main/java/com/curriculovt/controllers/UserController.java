@@ -1,6 +1,7 @@
 package com.curriculovt.controllers;
 
 import com.curriculovt.models.User;
+import com.curriculovt.models.UserRole;
 import com.curriculovt.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(required = false) String filtro,
+            @RequestParam(required = false) UserRole role,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(userService.findAll(filtro, pageable));
+        return ResponseEntity.ok(userService.findAll(filtro, role, pageable));
     }
 
     @GetMapping("/{id}")
