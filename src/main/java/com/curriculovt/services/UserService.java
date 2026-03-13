@@ -69,13 +69,13 @@ public class UserService {
                 .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
 
         user.setPagamento(true);
-        LocalDateTime novaExpiracao = LocalDateTime.now().plusMonths(1);
+
+        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(31);
         user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
 
         userRepository.save(user);
         auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
     }
-
     public Page<User> findAll(String termo, UserRole role, Pageable pageable) {
         validarSuperAdmin();
 
@@ -147,7 +147,7 @@ public class UserService {
 
         user.setPagamento(true);
 
-        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(30);
+        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(31);
         user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
 
         userRepository.save(user);
