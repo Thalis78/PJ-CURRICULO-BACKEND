@@ -187,7 +187,7 @@ public class UserService {
         long atualizacoesSenha = auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim);
         long excluidos = auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim);
 
-        double valorVenda = 11.0;
+        double valorVenda = 10.99;
         double taxaML = 0.11;
         double valorLiquidoUnitario = valorVenda - taxaML;
 

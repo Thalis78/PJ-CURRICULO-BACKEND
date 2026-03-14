@@ -21,7 +21,7 @@ public class PagamentoService {
                 .title("Plano Premium Curriculo_vt")
                 .description("Acesso ao sistema de currículos")
                 .quantity(1)
-                .unitPrice(new BigDecimal("11.00"))
+                .unitPrice(new BigDecimal("10.99"))
                 .build();
 
         List<PreferenceItemRequest> items = new ArrayList<>();
