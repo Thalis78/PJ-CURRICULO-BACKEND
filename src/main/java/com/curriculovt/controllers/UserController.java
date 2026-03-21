@@ -70,21 +70,4 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/ativar-pagamento")
-    public ResponseEntity<Void> ativarPagamentoManual(@RequestBody Map<String, Object> payload) {
-        Object idObj = payload.get("usuarioId");
-
-        if (idObj == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        try {
-            Long usuarioId = Long.parseLong(String.valueOf(idObj));
-            userService.ativarPagamento(usuarioId);
-            return ResponseEntity.ok().build();
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

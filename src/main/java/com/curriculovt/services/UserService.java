@@ -74,8 +74,8 @@ public class UserService {
         user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
 
         userRepository.save(user);
-        auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
     }
+
     public Page<User> findAll(String termo, UserRole role, Pageable pageable) {
         validarSuperAdmin();
 
@@ -95,6 +95,7 @@ public class UserService {
 
         return userRepository.findAll(pageable);
     }
+
     public User findById(Long id) {
         validarPropriedadeOuSuperAdmin(id);
         return userRepository.findById(id)
@@ -139,28 +140,10 @@ public class UserService {
     }
 
     @Transactional
-    public void ativarPagamento(Long userId) {
-        validarSuperAdmin();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
-
-        user.setPagamento(true);
-
-        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(31);
-        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
-
-        userRepository.save(user);
-
-        auditRepository.save(new UserAuditLog(user.getId(), "ATUALIZACAO_DATA"));
-    }
-
-    @Transactional
     public void delete(Long id) {
         validarSuperAdmin();
         User user = findById(id);
         userRepository.delete(user);
-        auditRepository.save(new UserAuditLog(id, "EXCLUSAO"));
     }
 
     public Map<String, Object> getMetrics(Integer year, Integer month) {
@@ -171,51 +154,29 @@ public class UserService {
         LocalDateTime agora = LocalDateTime.now();
 
         if (year != null && month != null) {
-            inicio = LocalDateTime.of(year, month, 3, 0, 0, 0);
+            inicio = LocalDateTime.of(year, month, 1, 0, 0, 0);
             fim = inicio.plusMonths(1);
         } else {
-            if (agora.getDayOfMonth() >= 3) {
-                inicio = agora.withDayOfMonth(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
-                fim = inicio.plusMonths(1);
-            } else {
-                inicio = agora.minusMonths(1).withDayOfMonth(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
-                fim = inicio.plusMonths(1);
-            }
+            inicio = agora.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            fim = inicio.plusMonths(1);
         }
 
-        long criados = auditRepository.countByAcaoAndDataEventoBetween("CRIACAO", inicio, fim);
         long atualizacoesSenha = auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim);
-        long excluidos = auditRepository.countByAcaoAndDataEventoBetween("EXCLUSAO", inicio, fim);
-
-        double valorVenda = 10.99;
-        double taxaML = 0.11;
-        double valorLiquidoUnitario = valorVenda - taxaML;
-
+        long totalUsuarios = userRepository.countByRole(UserRole.COMMON);
+        long totalAdmins = userRepository.countByRole(UserRole.SUPER_ADMIN);
         long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
-        long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);
-
-        double faturamentoBruto = totalAtivos * valorVenda;
-        double faturamentoLiquido = totalAtivos * valorLiquidoUnitario;
-
-        double perdaPorExclusoes = excluidos * (valorVenda + taxaML);
+        long totalInativos = totalUsuarios - totalAtivos;
 
         Map<String, Object> metrics = new HashMap<>();
-
-        metrics.put("criados", criados);
-        metrics.put("atualizacoesSenha", atualizacoesSenha);
-        metrics.put("excluidos", excluidos);
-        metrics.put("perdaPorExclusoes", perdaPorExclusoes);
-
-        metrics.put("faturamentoBruto", faturamentoBruto);
-        metrics.put("faturamentoLiquido", faturamentoLiquido);
-
-        metrics.put("totalUsuarios", userRepository.countByRole(UserRole.COMMON));
-        metrics.put("totalAdmins", userRepository.countByRole(UserRole.SUPER_ADMIN));
+        metrics.put("resetsSenhaMes", atualizacoesSenha);
+        metrics.put("totalUsuarios", totalUsuarios);
+        metrics.put("totalAdmins", totalAdmins);
         metrics.put("totalAtivos", totalAtivos);
         metrics.put("totalInativos", totalInativos);
 
         return metrics;
     }
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
