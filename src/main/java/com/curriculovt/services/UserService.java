@@ -149,25 +149,17 @@ public class UserService {
     public Map<String, Object> getMetrics(Integer year, Integer month) {
         validarSuperAdmin();
 
-        LocalDateTime inicio;
-        LocalDateTime fim;
         LocalDateTime agora = LocalDateTime.now();
 
-        if (year != null && month != null) {
-            inicio = LocalDateTime.of(year, month, 1, 0, 0, 0);
-            fim = inicio.plusMonths(1);
-        } else {
-            inicio = agora.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-            fim = inicio.plusMonths(1);
-        }
-
-        long atualizacoesSenha = auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim);
+        long atualizacoesSenha = auditRepository.countByAcao("ATUALIZACAO_SENHA");
 
         long totalUsuarios = userRepository.countByRole(UserRole.COMMON);
         long totalAdmins = userRepository.countByRole(UserRole.SUPER_ADMIN);
 
         long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
+
         long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);
+
         long totalNaoPagos = userRepository.countByRoleAndPagamentoFalse(UserRole.COMMON);
 
         Map<String, Object> metrics = new HashMap<>();
