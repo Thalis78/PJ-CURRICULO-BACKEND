@@ -162,17 +162,21 @@ public class UserService {
         }
 
         long atualizacoesSenha = auditRepository.countByAcaoAndDataEventoBetween("ATUALIZACAO_SENHA", inicio, fim);
+
         long totalUsuarios = userRepository.countByRole(UserRole.COMMON);
         long totalAdmins = userRepository.countByRole(UserRole.SUPER_ADMIN);
+
         long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
-        long totalInativos = totalUsuarios - totalAtivos;
+        long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);
+        long totalNaoPagos = userRepository.countByRoleAndPagamentoFalse(UserRole.COMMON);
 
         Map<String, Object> metrics = new HashMap<>();
-        metrics.put("resetsSenhaMes", atualizacoesSenha);
+        metrics.put("atualizacoesSenha", atualizacoesSenha);
         metrics.put("totalUsuarios", totalUsuarios);
         metrics.put("totalAdmins", totalAdmins);
         metrics.put("totalAtivos", totalAtivos);
         metrics.put("totalInativos", totalInativos);
+        metrics.put("totalNaoPagos", totalNaoPagos);
 
         return metrics;
     }

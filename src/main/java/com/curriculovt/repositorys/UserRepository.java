@@ -26,5 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole role, LocalDateTime data);
 
+    long countByRoleAndPagamentoFalse(UserRole role);
+
     long countByRole(UserRole role);
 }
