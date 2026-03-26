@@ -55,6 +55,7 @@ public class UserService {
 
         user.setPagamento(false);
         user.setDataExpiracao(null);
+        user.setDataCriacaoConta(LocalDateTime.now());
 
         User saved = userRepository.save(user);
         if (saved.getRole() == UserRole.COMMON) {
@@ -133,6 +134,9 @@ public class UserService {
             }
             if (userDetails.getDataExpiracao() != null && !userDetails.getDataExpiracao().equals(userNoBanco.getDataExpiracao())) {
                 userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
+            }
+            if (userDetails.getDataCriacaoConta() != null) {
+                userNoBanco.setDataCriacaoConta(userDetails.getDataCriacaoConta());
             }
         }
 

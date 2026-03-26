@@ -50,4 +50,6 @@ public class User {
     @JsonIgnore
     private Profile profile;
 
+    @Column(name = "data_criacao_conta")
+    private LocalDateTime dataCriacaoConta;
 }
