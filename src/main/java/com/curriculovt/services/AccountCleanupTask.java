@@ -19,6 +19,9 @@ public class AccountCleanupTask {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EnviarEmailService enviarEmailService;
+
     @Scheduled(cron = "0 0 4 * * *")
     @Transactional
     public void verificarContasInativas() {
@@ -43,6 +46,23 @@ public class AccountCleanupTask {
                 if (mesmoDiaDoMes && mesesPassados >= 1 && user.getDataExpiracao() == null) {
                     userRepository.delete(user);
                     System.out.println("Cron: Usuário " + user.getEmail() + " excluído (Criado em: " + dataCriacaoLocalDate + ")");
+                }
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 8 * * *")
+    public void verificarEnvioLembrete16Dias() {
+        LocalDate hoje = LocalDate.now();
+        List<User> usuariosNaoPagos = userRepository.findByRoleAndPagamentoFalse(UserRole.COMMON);
+
+        for (User user : usuariosNaoPagos) {
+            if (user.getDataCriacaoConta() != null) {
+                LocalDate dataCriacao = user.getDataCriacaoConta().toLocalDate();
+                long diasPassados = java.time.temporal.ChronoUnit.DAYS.between(dataCriacao, hoje);
+
+                if (diasPassados == 16) {
+                    enviarEmailService.enviarLembretePagamento(user);
                 }
             }
         }
