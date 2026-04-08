@@ -1,5 +1,6 @@
 package com.curriculovt.services;
 
+import com.curriculovt.models.Preco;
 import com.curriculovt.models.User;
 import com.curriculovt.repositorys.UserRepository;
 import jakarta.mail.*;
@@ -10,8 +11,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,9 @@ public class EnviarEmailService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PrecoService precoService;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -45,7 +51,6 @@ public class EnviarEmailService {
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
             message.setSubject(assunto);
-
             message.setContent(mensagem, "text/html; charset=utf-8");
 
             Transport.send(message);
@@ -144,6 +149,10 @@ public class EnviarEmailService {
     }
 
     public void enviarLembretePagamento(User user) {
+        Preco precoAtual = precoService.buscarConfiguracao();
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        String valorFinalFormatado = nf.format(precoAtual.getValorFinal());
+
         String assunto = "Importante: Continue com seu Currículo VT";
 
         String corpoHtml = "<!doctype html>" +
@@ -169,7 +178,7 @@ public class EnviarEmailService {
                 "                Você já deu o primeiro passo ao criar sua conta — agora está a poucos minutos de ter um currículo profissional pronto para enviar e se destacar nas vagas que deseja." +
                 "              </p>" +
                 "              <p style='margin: 0 0 15px 0; font-size: 15px; line-height: 1.6; color: #4b5563;'>" +
-                "                Com o <strong>Currículo VT</strong>, você não precisa perder tempo com formatação ou design. Nossa plataforma faz tudo isso automaticamente por apenas <strong>R$ 10,99</strong>." +
+                "                Com o <strong>Currículo VT</strong>, você não precisa perder tempo com formatação ou design. Nossa plataforma faz tudo isso automaticamente por apenas <strong>" + valorFinalFormatado + "</strong>." +
                 "              </p>" +
                 "              <div style='background-color: #eff6ff; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #2563eb;'>" +
                 "                <p style='margin: 0; font-size: 14px; color: #1e40af; line-height: 1.5;'>" +

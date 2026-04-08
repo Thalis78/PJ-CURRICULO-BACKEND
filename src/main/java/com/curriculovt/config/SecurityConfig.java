@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/pagamentos/webhook").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/precos").permitAll()
 
                         .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
@@ -61,6 +62,8 @@ public class SecurityConfig {
                                 "/idiomas", "/idiomas/**"
                         ).hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
 
+                        .requestMatchers(HttpMethod.POST, "/precos").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/precos").hasAuthority("ROLE_SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
