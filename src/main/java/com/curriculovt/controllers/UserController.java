@@ -1,7 +1,9 @@
 package com.curriculovt.controllers;
 
+import com.curriculovt.dtos.EmailRequest;
 import com.curriculovt.models.User;
 import com.curriculovt.models.UserRole;
+import com.curriculovt.services.EnviarEmailService;
 import com.curriculovt.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,25 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EnviarEmailService emailService;
+
     @PostMapping
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
         return new ResponseEntity<>(userService.saveUser(user), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/enviar-email")
+    public ResponseEntity<Void> enviarEmailCustomizado(@Valid @RequestBody EmailRequest request) {
+        emailService.enviarEmailTemplatePadrao(
+                request.getDestinatario(),
+                request.getAssunto(),
+                request.getTituloPrincipal(),
+                request.getTextoCorpo(),
+                request.getTextoBotao(),
+                request.getLinkBotao()
+        );
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/ativar-assinatura")

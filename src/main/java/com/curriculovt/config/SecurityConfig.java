@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/precos").permitAll()
 
                         .requestMatchers("/users/metrics").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers("/users/enviar-email").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers("/users/all").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/users/ativar-pagamento").hasAuthority("ROLE_SUPER_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_COMMON")
