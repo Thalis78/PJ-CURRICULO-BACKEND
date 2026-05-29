@@ -28,12 +28,12 @@ public class PagamentoService {
         String descricao;
 
         if ("15".equals(plano)) {
-            valorFinal = new BigDecimal("0.05");
+            valorFinal = new BigDecimal("5.00");
             titulo = "Plano Essencial - 15 Dias";
             descricao = "Acesso de 15 dias ao sistema de currículos";
         } else {
             Preco configuracaoPreco = precoService.buscarConfiguracao();
-            valorFinal = new BigDecimal("0.10");
+            valorFinal = configuracaoPreco.getValorFinal();
             titulo = "Plano Completo - 31 Dias";
             descricao = "Acesso de 31 dias ao sistema de currículos";
         }
