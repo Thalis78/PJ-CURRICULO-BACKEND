@@ -23,13 +23,13 @@ public class PagamentoController {
 
     @PostMapping("/checkout")
     public ResponseEntity<String> realizarPagamento(@RequestBody CheckoutRequestDTO request) {
-        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "pagamento");
+        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "pagamento", request.getPlano());
         return ResponseEntity.ok(url);
     }
 
     @PostMapping("/checkout-renovacao")
     public ResponseEntity<String> realizarRenovacao(@RequestBody CheckoutRequestDTO request) {
-        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "sessao-expirada");
+        String url = pagamentoService.gerarLinkDePagamento(request.getUsuarioId(), "sessao-expirada", request.getPlano());
         return ResponseEntity.ok(url);
     }
 
@@ -46,9 +46,6 @@ public class PagamentoController {
             paymentIdStr = String.valueOf(data.get("id"));
         }
 
-        System.out.println("--- NOVO WEBHOOK RECEBIDO ---");
-        System.out.println("Ação: " + action + " | ID Pagamento: " + paymentIdStr);
-
         if (paymentIdStr != null && ("payment.updated".equals(action) || "payment.created".equals(action))) {
             try {
                 PaymentClient client = new PaymentClient();
@@ -57,14 +54,23 @@ public class PagamentoController {
                 String usuarioId = payment.getExternalReference();
                 String status = payment.getStatus();
 
-                System.out.println("Status: " + status + " | User ID: " + usuarioId);
-
                 if ("approved".equals(status) && usuarioId != null) {
-                    System.out.println("PAGAMENTO APROVADO! Ativando assinatura...");
-                    userService.adicionarMesDeAssinatura(Long.parseLong(usuarioId));
+
+                    String planoDias = "31";
+                    if (payment.getMetadata() != null && payment.getMetadata().containsKey("plano_dias")) {
+                        planoDias = String.valueOf(payment.getMetadata().get("plano_dias"));
+                    }
+
+                    System.out.println("PAGAMENTO APROVADO! Plano selecionado: " + planoDias + " dias. Usuário: " + usuarioId);
+
+                    if ("15".equals(planoDias)) {
+                        userService.adicionarQuinzeDiasDeAssinatura(Long.parseLong(usuarioId));
+                    } else {
+                        userService.adicionarMesDeAssinatura(Long.parseLong(usuarioId));
+                    }
                 }
             } catch (Exception e) {
-                System.err.println("Erro ao processar pagamento: " + e.getMessage());
+                System.err.println("Erro ao processar pagamento no webhook: " + e.getMessage());
             }
         }
 

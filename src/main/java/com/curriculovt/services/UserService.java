@@ -77,6 +77,19 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void adicionarQuinzeDiasDeAssinatura(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
+
+        user.setPagamento(true);
+
+        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(15);
+        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
+
+        userRepository.save(user);
+    }
+
     public Page<User> findAll(String termo, UserRole role, Pageable pageable) {
         validarSuperAdmin();
 

@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CheckoutRequestDTO {
     private String usuarioId;
+
+    private String plano;
 }
