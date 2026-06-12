@@ -25,7 +25,7 @@ public class Profile {
     private User user;
 
     @NotBlank(message = "O campo nome não pode estar em branco.")
-    @Column(nullable = false, length = 100)
+    @Column(name = "nome_completo", nullable = false, length = 100)
     private String nome;
 
     @Column(columnDefinition = "TEXT")

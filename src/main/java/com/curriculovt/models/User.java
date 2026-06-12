@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -37,19 +36,10 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
-    @Column(name = "data_expiracao")
-    private LocalDateTime dataExpiracao;
-
     @Column(name = "senha_redefinida_por_email", nullable = false)
     private boolean senhaRedefinidaPorEmail = false;
-
-    @Column(nullable = false)
-    private boolean pagamento = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Profile profile;
-
-    @Column(name = "data_criacao_conta")
-    private LocalDateTime dataCriacaoConta;
 }

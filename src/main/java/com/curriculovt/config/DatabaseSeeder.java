@@ -38,7 +38,6 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             userRepository.findAll().forEach(u -> {
                 if (u.getRole() == UserRole.SUPER_ADMIN) {
-                    u.setPagamento(true);
                     userRepository.save(u);
                 }
             });

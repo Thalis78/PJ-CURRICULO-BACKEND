@@ -1,6 +1,5 @@
 package com.curriculovt.services;
 
-import com.curriculovt.models.Preco;
 import com.curriculovt.models.User;
 import com.curriculovt.repositorys.UserRepository;
 import jakarta.mail.*;
@@ -23,9 +22,6 @@ public class EnviarEmailService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PrecoService precoService;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -206,62 +202,4 @@ public class EnviarEmailService {
         enviarEmail(email, assunto, corpoHtml);
     }
 
-    public void enviarLembretePagamento(User user) {
-        Preco precoAtual = precoService.buscarConfiguracao();
-        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-        String valorFinalFormatado = nf.format(precoAtual.getValorFinal());
-
-        String assunto = "Importante: Continue com seu Currículo VT";
-
-        String corpoHtml = "<!doctype html>" +
-                "<html lang='pt-br'>" +
-                "  <head>" +
-                "    <meta charset='UTF-8' />" +
-                "    <meta name='viewport' content='width=device-width, initial-scale=1.0' />" +
-                "  </head>" +
-                "  <body style='margin: 0; padding: 0; background-color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;'>" +
-                "    <table role='presentation' border='0' cellpadding='0' cellspacing='0' width='100%'>" +
-                "      <tr>" +
-                "        <td align='center' style='padding: 40px 10px'>" +
-                "          <div style='max-width: 550px; width: 100%; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb;'>" +
-                "            <div style='background-color: #ffffff; padding: 30px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;'>" +
-                "              <div style='display: inline-block; vertical-align: middle; line-height: 1;'>" +
-                "                <span style='color: #18181b; font-size: 22px; font-weight: bold; letter-spacing: -0.5px; text-transform: uppercase;'>CURRÍCULO</span>" +
-                "                <span style='color: #2563eb; font-size: 22px; font-weight: 900; font-style: italic; letter-spacing: -1px; margin-left: 4px;'>VT</span>" +
-                "              </div>" +
-                "            </div>" +
-                "            <div style='padding: 35px; color: #374151'>" +
-                "              <h2 style='margin: 0 0 20px 0; color: #111827; font-size: 20px; font-weight: 700;'>Olá, " + user.getNome() + "!</h2>" +
-                "              <p style='margin: 0 0 15px 0; font-size: 15px; line-height: 1.6; color: #4b5563;'>" +
-                "                Você já deu o primeiro passo ao criar sua conta — agora está a poucos minutos de ter um currículo profissional pronto para enviar e se destacar nas vagas que deseja." +
-                "              </p>" +
-                "              <p style='margin: 0 0 15px 0; font-size: 15px; line-height: 1.6; color: #4b5563;'>" +
-                "                Com o <strong>Currículo VT</strong>, você não precisa perder tempo com formatação ou design. Nossa plataforma faz tudo isso automaticamente por apenas <strong>" + valorFinalFormatado + "</strong>." +
-                "              </p>" +
-                "              <div style='background-color: #eff6ff; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #2563eb;'>" +
-                "                <p style='margin: 0; font-size: 14px; color: #1e40af; line-height: 1.5;'>" +
-                "                  <strong>Vantagens:</strong> Liberação instantânea via PIX, acesso total por 31 dias e garantia de satisfação ou seu dinheiro de volta." +
-                "                </p>" +
-                "              </div>" +
-                "              <div style='text-align: center; margin-bottom: 30px;'>" +
-                "                <a href='https://curriculovt.com.br/login' style='display: inline-block; background-color: #2563eb; color: #ffffff; padding: 16px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);'>Garantir meu acesso agora</a>" +
-                "              </div>" +
-                "              <p style='margin: 0; font-size: 13px; line-height: 1.6; color: #6b7280; font-style: italic; text-align: center;'>" +
-                "                Lembrete: sua conta será excluída do nosso sistema em 15 dias caso opte por não fazer o currículo conosco nesse momento." +
-                "              </p>" +
-                "            </div>" +
-                "            <div style='background-color: #f9fafb; padding: 25px; text-align: center; border-top: 1px solid #e5e7eb;'>" +
-                "              <p style='margin: 0; font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>" +
-                "                Equipe Currículo <span style='color: #2563eb'>VT</span>" +
-                "              </p>" +
-                "            </div>" +
-                "          </div>" +
-                "        </td>" +
-                "      </tr>" +
-                "    </table>" +
-                "  </body>" +
-                "</html>";
-
-        enviarEmail(user.getEmail(), assunto, corpoHtml);
-    }
 }

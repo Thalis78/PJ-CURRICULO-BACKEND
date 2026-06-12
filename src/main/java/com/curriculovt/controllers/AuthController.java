@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -41,23 +40,6 @@ public class AuthController {
             User user = userOptional.get();
 
             if (passwordEncoder.matches(data.getPassword(), user.getPassword())) {
-
-                if (user.getDataExpiracao() != null && user.getDataExpiracao().isBefore(LocalDateTime.now())) {
-                    String token = tokenService.generateToken(user);
-
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("token", token);
-                    errorResponse.put("mensagem", "Sua assinatura expirou.");
-                    errorResponse.put("status", "EXPIRADO");
-                    errorResponse.put("dataExpiracao", user.getDataExpiracao());
-                    errorResponse.put("pagamento", false);
-                    errorResponse.put("id", user.getId());
-                    errorResponse.put("nome", user.getNome());
-                    errorResponse.put("role", user.getRole());
-
-                    return ResponseEntity.status(403).body(errorResponse);
-                }
-
                 String token = tokenService.generateToken(user);
 
                 Map<String, Object> response = new HashMap<>();
@@ -66,8 +48,6 @@ public class AuthController {
                 response.put("nome", user.getNome());
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole());
-                response.put("pagamento", user.isPagamento());
-                response.put("dataExpiracao", user.getDataExpiracao());
                 response.put("senhaRedefinidaPorEmail", user.isSenhaRedefinidaPorEmail());
 
                 return ResponseEntity.ok(response);
@@ -78,6 +58,7 @@ public class AuthController {
         errorResponse.put("mensagem", "E-mail ou senha inválidos");
         return ResponseEntity.status(401).body(errorResponse);
     }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -100,12 +81,10 @@ public class AuthController {
         }
     }
 
-
     @GetMapping("/me")
     public ResponseEntity<?> getMe(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             String token = authorizationHeader.replace("Bearer ", "");
-
             String email = tokenService.validateToken(token);
 
             if (email == null || email.isEmpty()) {
@@ -122,9 +101,8 @@ public class AuthController {
                 response.put("nome", user.getNome());
                 response.put("email", user.getEmail());
                 response.put("role", user.getRole());
-                response.put("pagamento", user.isPagamento());
-                response.put("dataExpiracao", user.getDataExpiracao());
                 response.put("senhaRedefinidaPorEmail", user.isSenhaRedefinidaPorEmail());
+
                 return ResponseEntity.ok(response);
             }
 

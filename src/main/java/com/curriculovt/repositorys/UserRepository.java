@@ -23,13 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findByRole(UserRole role, Pageable pageable);
 
-    long countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole role, LocalDateTime data);
-
-    long countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole role, LocalDateTime data);
-
-    long countByRoleAndPagamentoFalse(UserRole role);
-
     long countByRole(UserRole role);
 
-    List<User> findByRoleAndPagamentoFalse(UserRole role);
 }

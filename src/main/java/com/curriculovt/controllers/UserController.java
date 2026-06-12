@@ -44,20 +44,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/ativar-assinatura")
-    public ResponseEntity<Void> ativarAssinatura(@RequestBody Map<String, Object> payload) {
-        Object idObj = payload.get("usuarioId");
-
-        if (idObj == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Long usuarioId = Long.parseLong(String.valueOf(idObj));
-        userService.adicionarMesDeAssinatura(usuarioId);
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
             @RequestParam(required = false) String filtro,

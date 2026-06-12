@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> {
-    List<Experiencia> findByProfileId(Long profileId);
     List<Experiencia> findByProfileIdOrderByDataInicioDesc(Long profileId);
 }

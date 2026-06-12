@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,11 +37,6 @@ public class UserService {
         }
     }
 
-    private LocalDateTime ajustarParaFinalDoDia(LocalDateTime data) {
-        if (data == null) return null;
-        return data.withHour(23).withMinute(59).withSecond(59).withNano(0);
-    }
-
     @Transactional
     public User saveUser(User user) {
         validarSenhaForte(user.getPassword());
@@ -53,41 +47,11 @@ public class UserService {
             user.setEmail(user.getEmail().toLowerCase().trim());
         }
 
-        user.setPagamento(false);
-        user.setDataExpiracao(null);
-        user.setDataCriacaoConta(LocalDateTime.now());
-
         User saved = userRepository.save(user);
         if (saved.getRole() == UserRole.COMMON) {
             auditRepository.save(new UserAuditLog(saved.getId(), "CRIACAO"));
         }
         return saved;
-    }
-
-    @Transactional
-    public void adicionarMesDeAssinatura(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
-
-        user.setPagamento(true);
-
-        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(31);
-        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
-
-        userRepository.save(user);
-    }
-
-    @Transactional
-    public void adicionarQuinzeDiasDeAssinatura(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNaoEncontradoException("Usuário não encontrado."));
-
-        user.setPagamento(true);
-
-        LocalDateTime novaExpiracao = LocalDateTime.now().plusDays(15);
-        user.setDataExpiracao(ajustarParaFinalDoDia(novaExpiracao));
-
-        userRepository.save(user);
     }
 
     public Page<User> findAll(String termo, UserRole role, Pageable pageable) {
@@ -145,12 +109,6 @@ public class UserService {
             if (userDetails.getRole() != null) {
                 userNoBanco.setRole(userDetails.getRole());
             }
-            if (userDetails.getDataExpiracao() != null && !userDetails.getDataExpiracao().equals(userNoBanco.getDataExpiracao())) {
-                userNoBanco.setDataExpiracao(ajustarParaFinalDoDia(userDetails.getDataExpiracao()));
-            }
-            if (userDetails.getDataCriacaoConta() != null) {
-                userNoBanco.setDataCriacaoConta(userDetails.getDataCriacaoConta());
-            }
         }
 
         return userRepository.save(userNoBanco);
@@ -166,26 +124,14 @@ public class UserService {
     public Map<String, Object> getMetrics(Integer year, Integer month) {
         validarSuperAdmin();
 
-        LocalDateTime agora = LocalDateTime.now();
-
         long atualizacoesSenha = auditRepository.countByAcao("ATUALIZACAO_SENHA");
-
         long totalUsuarios = userRepository.countByRole(UserRole.COMMON);
         long totalAdmins = userRepository.countByRole(UserRole.SUPER_ADMIN);
-
-        long totalAtivos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoAfter(UserRole.COMMON, agora);
-
-        long totalInativos = userRepository.countByRoleAndPagamentoTrueAndDataExpiracaoBefore(UserRole.COMMON, agora);
-
-        long totalNaoPagos = userRepository.countByRoleAndPagamentoFalse(UserRole.COMMON);
 
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("atualizacoesSenha", atualizacoesSenha);
         metrics.put("totalUsuarios", totalUsuarios);
         metrics.put("totalAdmins", totalAdmins);
-        metrics.put("totalAtivos", totalAtivos);
-        metrics.put("totalInativos", totalInativos);
-        metrics.put("totalNaoPagos", totalNaoPagos);
 
         return metrics;
     }
